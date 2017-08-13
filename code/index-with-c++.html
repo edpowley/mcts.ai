@@ -1,0 +1,533 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Monte Carlo Tree Search - Code</title>
+<style type="text/css">
+<!--
+.style3 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	color: #666666;
+}
+.style6 {
+	font-size: 44px;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #666666;
+}
+.style7 {
+	font-family: Arial, Helvetica, sans-serif;
+	color: #333333;
+}
+a:link {
+	color: #CC6600;
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+	color: #993333;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+.style8 {
+	font-size: large;
+	font-weight: bold;
+}
+.style11 {
+	font-size: small;
+	color: #000000;
+	font-family: "Courier New", Courier, monospace;
+}
+.style15 {color: #009900}
+.style16 {color: #0000FF}
+.style17 {color: #CC0099}
+.style24 {color: #006666}
+.style27 {color: #000000}
+.style31 {color: #CC0000}
+.style34 {color: #CC0099}
+.style12 {font-family: Arial, Helvetica, sans-serif; color: #666666; font-size: xx-large;}
+.style35 {font-family: "Courier New", Courier, monospace; color: #000000;}
+.style37 {color: #666666; font-family: Arial, Helvetica, sans-serif;}
+.style38 {
+	font-family: "Courier New", Courier, monospace;
+	font-size: small;
+}
+-->
+</style>
+</head>
+
+<body>
+<table width="95%" border="0" cellpadding="16" cellspacing="0">
+  <tr>
+    <td width="149"><div align="center"><img src="../logo/mcts-logo-36a.png" width="150" height="36" /></div></td>
+    <td class="style6">Code</td>
+  </tr>
+  <tr>
+    <td valign="top"><p align="center">      <span class="style37"><a href="../index.html">Home</a></span></p>
+      <p align="center" class="style37"><a href="../about/index.html">About</a></p>
+    <p align="center" class="style37"><a href="../tutorial/index.html">Tutorial</a></p>
+    <p align="center" class="style37"><a href="../code/index.html">Code</a></p>
+    <p align="center" class="style37"><a href="../bibliography/index.html">Bibliography</a></p>
+    <p align="center" class="style37"><a href="../resources/index.html">Resources</a></p>
+    <p align="center"><span class="style37"><a href="../project/index.html">Project</a></span><span class="style3"><br />
+    </span></p></td>
+    <td valign="top" bordercolor="#FF6600" bgcolor="#FFF5D7"><p class="style7">      This page shows basic MCTS  implementations  in Java and C++. The listings are shown with timing, testing and debugging code removed for readability.<br />
+        <br />
+</p>
+      <hr noshade="noshade" />
+      <p class="style12">Java Code</p>
+      <p class="style7"> The following Java code shows a minimal one-page MCTS implementation by Simon Lucas. <br />
+      This code is strictly tutorial in nature (a simple toin coss is used for each playout)  but it clearly  demonstrates  the operation of the algorithm.</p>
+      <table width="100%" align="center" cellspacing="12" bgcolor="#FFFFFF">
+        <tr>
+          <td><p class="style38"><span class="style34">import</span> java.util.LinkedList;<br />
+              <span class="style34">import</span> java.util.List;<br />
+              <span class="style34">import</span> java.util.Random;</p>
+            <p class="style38"><span class="style34">public class</span> TreeNode {<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;static</span> Random <span class="style16"><em>r</em></span> = <span class="style34">new</span> Random();<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;static int</span> <span class="style16"><em>nActions</em></span> = 5;<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;static double</span> <span class="style16"><em>epsilon</em></span> = 1e-6;</p>
+            <p class="style38"> &nbsp;&nbsp;&nbsp;&nbsp;TreeNode[] <span class="style16">children</span>;<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;double</span> <span class="style16">nVisits</span>, <span class="style16">totValue</span>;</p>
+            <p class="style38"> <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;public void</span> selectAction() {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;List&lt;TreeNode&gt; visited = <span class="style34">new</span> LinkedList&lt;TreeNode&gt;();<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TreeNode cur = <span class="style34">this</span>;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;visited.add(<span class="style34">this</span>);<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while</span> (!cur.isLeaf()) {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cur = cur.select();<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;visited.add(cur);<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cur.expand();<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TreeNode newNode = cur.select();<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;visited.add(newNode);<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;double </span>value = rollOut(newNode);<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for</span> (TreeNode node : visited) {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style15">&nbsp;// would need extra logic for n-player game</span><br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;node.updateStats(value);<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;}</p>
+            <p class="style38"> <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;public void</span> expand() {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style16">children</span> = <span class="style34">new</span> TreeNode[<span class="style16"><em>nActions</em></span>];<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for</span> (<span class="style34">int</span> i=0; i&lt;<span class="style16"><em>nActions</em></span>; i++) {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style16">children</span>[i] = <span class="style34">new</span> TreeNode();<br />
+              &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;}<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;}</p>
+            <p class="style38"> <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;private</span> TreeNode select() {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TreeNode selected = <span class="style34">null</span>;<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;double</span> bestValue = Double.<span class="style16"><em>MIN_VALUE</em></span>;<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for</span> (TreeNode c : <span class="style16">children</span>) {<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;double</span> uctValue = c.<span class="style16">totValue</span> / (c.<span class="style16">nVisits</span> + <span class="style16"><em>epsilon</em></span>) +<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Math.<em>sqrt</em>(Math.<em>log</em>(<span class="style16">nVisits</span>+1) / (c.<span class="style16">nVisits</span> + <span class="style16"><em>epsilon</em></span>)) +<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style16"><em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r</em></span>.nextDouble() * <span class="style16"><em>epsilon</em></span>;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style15">// small random number to break ties randomly in unexpanded nodes</span><br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">if</span> (uctValue &gt; bestValue) {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;selected = c;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bestValue = uctValue;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">return</span> selected;<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;}</p>
+            <p class="style38"><span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;public boolean</span> isLeaf() {<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return</span> <span class="style16">children</span> == <span class="style34">null</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}</p>
+            <p class="style38"> <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;public</span> <span class="style34">double</span> rollOut(TreeNode tn) {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style15">&nbsp;// ultimately a roll out will end in some value<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// assume for now that it ends in a win or a loss<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// and just return this at random</span><br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return</span> <span class="style16"><em>r</em></span>.nextInt(2);<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;}</p>
+            <p class="style38"> <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;public void</span> updateStats(<span class="style34">double</span> value) {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style16">nVisits</span>++;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style16">totValue</span> += value;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;}</p>
+            <p class="style38"> <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;public int</span> arity() {<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return</span> <span class="style16">children</span> == <span class="style34">null</span> ? 0 : <span class="style16">children.length</span>;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;}<br />
+              }</p>            
+            </td>
+        </tr>
+      </table>
+      <p><span class="style7">The complete Java code for this example can be downloaded <a href="mcts-java-1.zip">here</a>.<br />
+      </span><br />
+      </p>
+      <hr noshade="noshade" />
+      <p class="style12">C++ Code</p>
+      <p class="style7"> The following code shows a C++ implementation of MCTS for the game of <a href="http://en.wikipedia.org/wiki/Gomoku">Gomoku</a>. 
+        <br />
+      </p>
+      <p class="style12">Game Class </p>
+      <p class="style7"><span class="style8"></span>The generic game class supports simple zero-sum combinatorial games between two players who take turns setting an empty board cell to their colour. </p>
+      <table width="100%" align="center" cellspacing="12" bgcolor="#FFFFFF">
+      <tr>
+        <td><p class="style11"><span class="style17">class</span> <span class="style24 style27">CGame</span><br />
+            {<br />
+            <span class="style17">public</span>:<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">void</span>&nbsp;&nbsp;&nbsp;NewGame(<span class="style17">int</span> starter);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24"><span class="style17">int</span></span> &nbsp;&nbsp;&nbsp;WhoseMove(<span class="style17">void</span>) <span class="style17">const</span>;<br />
+            <span class="style24"></span>&nbsp;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24"><span class="style34">virtual void</span></span>&nbsp;SetState(<span class="style24">CGame</span>* state);<br />
+&nbsp;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24"><span class="style34">virtual int</span></span> NumLegalMoves(<span class="style34">void</span>) <span class="style34">const</span>;<br />
+<span class="style24"></span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24"><span class="style34">virtual int</span></span>&nbsp;MakeNthMove(<span class="style34">int</span> n); &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style15">&nbsp;// returns winner (if any)</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24"><span class="style17">virtual int</span></span>&nbsp;Playout(<span class="style17">void</span>);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style15">// returns winner (if any)</span><br />
+            </p>
+      <p class="style11"><span class="style17">protected<span class="style27">:</span></span><br />
+            <span class="style15">&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24"><span class="style34">int</span></span> &nbsp;&nbsp;&nbsp;&nbsp;<span class="style27">m_NumCells;&nbsp;</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // number of board cells<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24"><span class="style34">int</span></span> &nbsp;&nbsp;&nbsp;&nbsp;<span class="style27">m_Board[<span class="style24">MAX_CELLS</span>];&nbsp;</span>&nbsp;// current board state<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24"><span class="style34">int</span></span> &nbsp;&nbsp;&nbsp;&nbsp;<span class="style27">m_Starter;&nbsp;</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // who started (WHITE | BLACK)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24"><span class="style34">int</span></span> &nbsp;&nbsp;&nbsp;&nbsp;<span class="style27">m_Winner;&nbsp;</span>&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // winner (0 if no winner yet)<br />
+</span>};</p></td>
+      </tr>
+    </table>
+    <p><span class="style7">Each game has a starter, a number of discrete moves and a result (win/loss/draw). Each board state has a number of legal moves that are indexed by   order, guaranteed to be the same for each repetition of that board state. The default game is played on a 10x10 square board.</span></p>
+    <p><span class="style7">Moves are described by either their <em>N</em>th position  in the legal move list (order) or their board position (location).</span></p>
+    <p class="style7"> Specific game types are subclassed from the generic game class. Our default game is  10x10 Gomoku,  in which a player  wins by  making a size 5 line of their  colour  orthogonally or diagonally.<br />
+</p>
+    <p class="style12">MCTS Search    </p>
+    <p class="style7"><span class="style8">Node Class</span><br />
+      The node class is the backbone of the MCTS algorithm that defines the tree structure. Each node corresponds to one action (i.e. move) and encodes: <br />
+    </p>
+    <p><span class="style7">&nbsp;&nbsp;&#8226;      move order, </span><br />
+        <span class="style7">&nbsp;&nbsp;&#8226;      move location, </span><br />
+        <span class="style7">&nbsp;</span><span class="style7">&nbsp;&#8226;      number of children, </span><br />
+        <span class="style7">&nbsp;&nbsp;&#8226;      number of expected children, </span><br />
+        <span class="style7">&nbsp;&nbsp;&#8226;      whether all children have been visited, </span><br />
+        <span class="style7">&nbsp;&nbsp;&#8226;      whether the move value is <em>known</em> (i.e.  this move results in a terminal condition),</span></p>
+    <p><span class="style7">and most importantly:</span></p>
+    <p><span class="style7">&nbsp;&nbsp;&#8226;      estimated move value, and</span><br />
+      <span class="style7">&nbsp;&nbsp;&#8226;       number of visits.</span></p>
+    <p><span class="style7">Most  of this information is packed into  UINTs  for efficiency.</span></p>
+    <table width="100%" align="center" cellspacing="12" bgcolor="#FFFFFF">
+      <tr>
+        <td><p class="style11"><span class="style34">const int </span><span class="style24">MC_WIN</span>&nbsp;&nbsp;= <span class="style16">&nbsp;1</span>; <span class="style15">&nbsp;// win</span><br />
+            <span class="style34">const int </span><span class="style24">MC_DRAW</span>&nbsp;= <span class="style16">&nbsp;0</span>; <span class="style15">&nbsp;// draw</span><br />
+            <span class="style34">const int </span><span class="style24">MC_LOSS</span> = -<span class="style16">1</span>; <span class="style15">&nbsp;// loss<br />
+            </span><span class="style11"><span class="style34">const int </span><span class="style24">MC_LIVE</span> = &nbsp;<span class="style16">2</span>; <span class="style15"> &nbsp;// game not over yet</span></span>
+          </p>
+          <p class="style11"><span class="style17">class</span> <span class="style27">CNode</span><br />
+            {<br />
+  <span class="style17">public</span>:<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;CNode(<span class="style17">int</span> move=0, <span class="style17">int</span> expected=0);<br />
+  &nbsp;<br />
+  <span class="style24"><span class="style17"><span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;int &nbsp;&nbsp;&nbsp;<span class="style27">AddValue(</span>int <span class="style27">value);</span><br />
+  &nbsp;</span></span><span class="style34">&nbsp;&nbsp;&nbsp;int &nbsp;&nbsp;&nbsp;<span class="style27">AddVisit(</span>void<span class="style27">)</span></span></span>;<br />
+  <span class="style24"><span class="style17">&nbsp;&nbsp;&nbsp;&nbsp;void</span></span> &nbsp;&nbsp;AddChild(<span class="style24">CNode</span>* child);<span class="style24"><br />
+          </span></p>
+          <p class="style11"><span class="style17">private<span class="style27">:</span></span><br />
+            <span class="style24">&nbsp;&nbsp;&nbsp;&nbsp;UINT</span> &nbsp;&nbsp;<span class="style24">m_Move</span>;&nbsp;<span class="style15">&nbsp;&nbsp;// encodes move information<br />
+          </span><span class="style24">&nbsp;&nbsp;&nbsp;&nbsp;UINT</span> &nbsp;&nbsp;<span class="style24">m_Data</span>;&nbsp;<span class="style15">&nbsp;&nbsp;// encodes node properties:  known, num expected,  etc</span></p>
+          <p class="style11">&nbsp;&nbsp;&nbsp;&nbsp;<span class="style17">int</span> &nbsp;&nbsp;&nbsp;<span class="style24">m_Value</span>; <span class="style15"> &nbsp;// node value (-1/0/1 if known)</span><br />
+            &nbsp;&nbsp;&nbsp;<span class="style11">&nbsp;<span class="style17">int</span> &nbsp;&nbsp;&nbsp;<span class="style24">m_Visits</span>; <span class="style15"> // number of times node has been visited</span><br />
+            </span><br />
+  &nbsp;<span class="style24">&nbsp;&nbsp;&nbsp;CNode* m_Parent;<span class="style15">&nbsp;// parent of this node</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;CNode* m_Child;<span class="style15">&nbsp;&nbsp;// next ply in search</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;CNode* m_Next;<span class="style15">&nbsp;&nbsp;&nbsp;// next sibling at this ply</span></span><br />
+            };</p>
+          </td>
+      </tr>
+    </table>
+    <p class="style7">Rather than having a pointer to every child node (as per typical tree search implementations), we provide a single  pointer to the node's first child and a sibling pointer with which the child list can  be traversed. This is functionally equivalent to the standard method but has advantages of speed and  memory efficiency, as  children can be  dynamically added only as required. Resulting tree structures will look something like this:</p>
+    <p align="center" class="style7"><img src="node-structure-1.png" width="400" height="285" /></p>
+    <p class="style7"><span class="style8">MCTS Class</span><br />
+      The MCTS class creates a  search tree for the current player (the <em>owner</em> of the search) to determine the best move for a given board position for the current game.</p>
+    <table width="100%" align="center" cellspacing="12" bgcolor="#FFFFFF">
+      <tr>
+        <td><p class="style11"><span class="style17">class</span> <span class="style27">CMCTS</span><br />
+          {<br />
+          <span class="style17">public</span>:<br />
+&nbsp;&nbsp;&nbsp;&nbsp;CMTS(<span class="style24">CGame</span>* game);</p>
+          <p class="style11">&nbsp;&nbsp;&nbsp;<span class="style24">&nbsp;<span class="style17">void</span></span> &nbsp;&nbsp;Shuffle(<span class="style17">void</span>); &nbsp;<span class="style15">// shuffles move indices</span><br />
+&nbsp;&nbsp;&nbsp;<span class="style24">&nbsp;</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style11"><span class="style24"><span class="style17">int</span></span> &nbsp;&nbsp;&nbsp;SearchUCT(<span class="style24">CGame</span>* state, <span class="style24">CAI</span>* ai);<br />
+  </span></p>
+          <p class="style11"><span class="style24">&nbsp;&nbsp;&nbsp;&nbsp;CNode</span>* DescendTree(<span class="style24">CNode</span>* node);<br />
+              <span class="style24">&nbsp;&nbsp;&nbsp;&nbsp;CNode</span>* ExpandTree(<span class="style24">CNode</span>* node);<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">int</span> <span class="style24"> &nbsp; &nbsp;</span>Evaluate(<span class="style24">CNode</span>* node);<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="style24">void</span>* <span class="style24"> &nbsp;</span>Backpropagate(<span class="style24">CNode</span>* node, <span class="style34">int</span> value);</p>
+          <p class="style11"><span class="style24">&nbsp;&nbsp;&nbsp;&nbsp;CNode</span>* UCBChoice(<span class="style24">CNode</span>* node);<br />
+            <span class="style11"><span class="style24">&nbsp;&nbsp;&nbsp;&nbsp;CNode</span>* RootChoice(<span class="style24">CNode</span>* node);</span>          </p>
+          <p class="style11"><span class="style17">private<span class="style27">:</span></span><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;<span class="style24">CGame</span>* <span class="style24">m_Game</span>;<span class="style15">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// private game instance for rough working</span><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;<span class="style17">double </span><span class="style24">m_C</span>;<span class="style15">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// exploration bias term</span><span class="style15"><br />
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="style17">int</span>*** <span class="style24">m_Shuffles</span>; <span class="style15">&nbsp;// shuffled number sets to randomise move choices</span><br />
+            };</p>
+          </td>
+      </tr>
+    </table>
+    <p class="style7">As  the search enters each  node, all  unvisited children must be visited first and it is important to select these in a  random order. To achieve this,  we define an  m_Shuffles array that  provides a level of indirection when selecting moves indices, and seed this array with a shuffled number set for all possible cases.</p>
+    <p class="style7">The m_C data member is the exploration constant <em>C</em> used to bias node selection. This is set to a default value of 1 but can be easily adjusted dynamically during the search.</p>
+    <p class="style7"> CAI  is a helper class that encapsulates the current player's AI settings (maximum search time, maximum search iterations, AMAF, etc).</p>
+    <p class="style7"><span class="style8"> UCT Search</span><br />
+The search method performs UCT search for the specified player for the specified search time. The algorithm repeats  the basic MCTS operation using UCB  node selection until the time limit is reached, then returns the move corresponding to the most promising root child. </p>
+    <table width="100%" align="center" cellspacing="12" bgcolor="#FFFFFF">
+      <tr>
+        <td><p class="style11"><span class="style15">// Performs UCT search for the current player using the specified AI settings.<br />
+          //<br />
+          //	Returns:<br />
+          //		&nbsp;&nbsp;&nbsp;&nbsp;Move index of estimated best move.<br />
+          //</span><br />
+          <span class="style24"><span class="style17">int</span></span> <span class="style24">CMCTS</span>::SearchUCT(<span class="style24">CGame</span>* state, <span class="style34">int</span> max_iterations)<br />
+            {&nbsp;&nbsp;<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;<span class="style24">CNode</span>* root = <span class="style24"> <span class="style17">new</span> CNode</span>(<span class="style16">0</span>, m_Game-&gt;<span class="style24">NumLegalMoves</span>());&nbsp; <span class="style15">//  UCT tree</span><br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">int</span> iterations = <span class="style16">0</span>;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style17">while</span> (<span class="style24"><span class="style27">++iterations &lt; max_iterations</span>)</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m_Game-&gt;<span class="style24">SetState</span>(state); &nbsp;<span class="style15">// reset the board state</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24">CNode</span>* leaf = <span class="style24">DescendTree</span>(root);&nbsp;&nbsp;<span class="style15">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 1. Selection</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> leaf = <span class="style24">ExpandTree</span>(leaf);&nbsp;&nbsp;&nbsp;&nbsp;<span class="style15">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 2. Expansion</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">int</span> &nbsp;&nbsp;value = <span class="style24">Evaluate</span>(leaf); &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="style15">// 3. Simulation</span><br />
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24">Backpropagate</span>(leaf, value);&nbsp;&nbsp;<span class="style15">// 4. Backpropagation<br />
+</span>&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+            </p>
+          <p class="style11">&nbsp;&nbsp;&nbsp;&nbsp;<span class="style15">// Return the best move<br />
+          </span>&nbsp;<span class="style17">&nbsp;&nbsp;&nbsp;int</span> move = <span class="style24">RootChoice</span>(root)-&gt;<span class="style24">GetOrder</span>();<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;<span class="style17">delete </span> root; &nbsp;<span class="style15">// or store for future reuse<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;</span><span class="style17">return </span> move;<br />
+          }</p>
+          </td>
+      </tr>
+    </table>
+    <p class="style7"><span class="style7">The four basic MCTS steps (selection, expansion, simulation, backpropagation) are evident in the main loop.</span><br />
+    </p>
+    <p class="style7"><span class="style8">1. Selection (Tree Descent)</span><br />
+Starting at the root node, this method descends the search tree choosing and making the best available move  at each step on a local board copy until a leaf node is reached. Leaf nodes will either have a known (terminal) value  or have an incomplete child list.</p>
+    <table width="100%" align="center" cellspacing="12" bgcolor="#FFFFFF">
+      <tr>
+        <td><p class="style11"><span class="style15">//	Descends tree choosing the best move at each step.<br />
+          //<br />
+          //	Returns:	&nbsp;&nbsp;&nbsp;&nbsp;<br />
+          //&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Leaf node reached.<br />
+          //</span><br />
+          <span class="style24">CNode</span>* <span class="style24">CMCTS</span>::DescendTree(<span class="style24">CNode</span>* node)<br />
+          {<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="style17">while </span>(!node-&gt;<span class="style24">IsKnown</span>() &amp;&amp; node-&gt;<span class="style24">AllVisited</span>())<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;{<br />
+              <span class="style17">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="style15">// Descend to best child</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;node = <span class="style24">UCBChoice</span>(node);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;m_Game-&gt;<span class="style24">MakeNthMove</span>(node-&gt;<span class="style24">GetOrder</span>());<br />
+&nbsp;&nbsp;&nbsp; }<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style17">return</span> node;<br />
+            }</p>
+          </td>
+      </tr>
+    </table>
+    <p class="style7"><span class="style8">2. Expansion</span><br />
+The following method expands the tree, if needed, at the  leaf node found by tree descent.<br />
+    </p>
+    <table width="100%" align="center" cellspacing="12" bgcolor="#FFFFFF">
+      <tr>
+        <td><p class="style11"><span class="style15">//	Expands tree by adding a new child node to the specified leaf node.<br />
+          //<br />
+        // Leaf nodes will either be terminal or have incomplete child lists.<br />
+        //</span><span class="style15"><br />
+              //
+          Returns:<br />
+          //		&nbsp;&nbsp;&nbsp;&nbsp;New child node, which is the new leaf.<br />
+          //</span><br />
+          <span class="style24">CNode</span>* <span class="style24">CMCTS</span>::ExpandTree(<span class="style24">CNode</span>* node)<br />
+          {<br />
+          <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;if</span> (node-&gt;<span class="style24">IsKnown</span>())<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;<span class="style34">return</span> node; <span class="style15">&nbsp;// no need to expand</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style17">if</span> (node-&gt;<span class="style24">GetChild</span>() == <span class="style17">NULL</span>) <span class="style15">&nbsp;// first visit after creation</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;node-&gt;<span class="style24">SetNumExpected</span>(m_Game-&gt;<span class="style24">NumLegalMoves</span>()); <span class="style15">&nbsp;// set expectation</span></p>
+          <p class="style11">&nbsp;&nbsp;&nbsp;&nbsp;<span class="style15">// Get shuffled move index for  next available move slot<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;</span><span class="style17">int</span>&nbsp;shuffle = node-&gt;<span class="style24">GetId</span>() % <span class="style24">NUM_SHUFFLES</span>;<br />
+&nbsp;&nbsp;&nbsp;<span class="style17">&nbsp;int</span>&nbsp;slot&nbsp; &nbsp;&nbsp;= node-&gt;<span class="style24">GetNumChildren</span>();<br />
+&nbsp;&nbsp;&nbsp;<span class="style17">&nbsp;int</span> move &nbsp;&nbsp;&nbsp;= m_Shuffles[node-&gt;<span class="style24">GetNumExpected</span>()][shuffle][slot];<br />
+&nbsp;<span class="style15">&nbsp;&nbsp;&nbsp;<br />
+&nbsp;&nbsp;&nbsp; // Create new child and add to parent<br />
+&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="style24">CNode</span>* child = <span class="style24"> <span class="style17">new</span> CNode</span>(move);<br />
+ &nbsp;&nbsp;&nbsp;&nbsp;child-&gt;<span class="style24">SetNext</span>(node-&gt;<span class="style24">GetChild</span>()); <span class="style15">&nbsp;// insert at  head of sibling list</span><br />
+ &nbsp; &nbsp;&nbsp;node-&gt;<span class="style24">AddChild</span>(child);</p>
+          <p class="style11"><span class="style15">&nbsp;&nbsp;&nbsp;&nbsp;// Make the new move<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">int</span></span> result = m_Game-&gt;<span class="style24">MakeNthMove</span>(move);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style17">if</span> (result != <span class="style24">MC_LIVE</span>)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style15">// Move ends the game - set child to known result</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;child-&gt;<span class="style24">SetKnown</span>(); &nbsp;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;child-&gt;<span class="style24">SetValue</span>(result);</p>
+          <p class="style11"><span class="style15">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Apply game-theoretic logic here...</span><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;}<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;<span class="style17">return</span> child;<br />
+          }</p></td>
+      </tr>
+    </table>
+    <p><span class="style7">If this is the first visit to this leaf node, then the expected number of children are determined and assigned to it. An unvisited choice is  selected at random (using a pre-shuffled move index list) and a corresponding child node created for it. The  selected move is made and its node becomes the new leaf.</span></p>
+    <p><span class="style7"><span class="style8">3. Simulation</span><br />
+If the tree descent and expansion steps fail to provide a known result, then a random simulation is run and its MC value (-1/0/1) returned.</span><br />
+    </p>
+    <table width="100%" align="center" cellspacing="12" bgcolor="#FFFFFF">
+      <tr>
+        <td><p class="style11"><span class="style15">//	Evaluates node, by  simulation if necessary.<br />
+          //</span><span class="style15"><br />
+            //
+            Returns:<br />
+            //		&nbsp;&nbsp;&nbsp;&nbsp;Estimated node value (-1/0/1).<br />
+            //</span><br />
+          <span class="style24"><span class="style34">int</span> </span><span class="style24">CMCTS</span>::Evaluate(<span class="style24">CNode</span>* node)<br />
+          {<br />
+          <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;return</span> node-&gt;<span class="style24">IsKnown</span>()<br />
+          <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>? &nbsp;node-&gt;<span class="style24">GetValue</span>() &nbsp;<span class="style15">&nbsp;&nbsp;//
+            known result</span><br />
+          <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>: &nbsp;m_Game-&gt;<span class="style24">Playout</span>(); &nbsp;<span class="style15">//
+            simulation result</span><br />
+}  </p>
+          </td>
+      </tr>
+    </table>
+    <p class="style7"><span class="style8">4. Backpropagation</span><br />
+The final value is backpropagated up the sequence of selected moves. Each  node along the sequence is visited and the value added to it. The value is negated with each ply as the opponents have opposed goals (assume zero-sum game).</p>
+    <table width="100%" align="center" cellspacing="12" bgcolor="#FFFFFF">
+      <tr>
+        <td><p class="style11"><span class="style15">          //		Propagates the leaf node value back up the current move sequence.<br />
+          //</span><br />
+          <span class="style24">void</span>* <span class="style24">CMCTS</span>::Backpropagate(<span class="style24">CNode</span>* node, <span class="style17">int</span> value)<br />
+          {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style17">for</span> (<span class="style24">CNode</span>* ptr = node; ptr != <span class="style17">NULL</span>; ptr = ptr-&gt;<span class="style24">GetParent</span>())<br />
+&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style17">if</span> (!ptr-&gt;<span class="style24">IsKnown</span>())<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ptr-&gt;<span class="style24">AddValue</span>(value);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ptr-&gt;<span class="style24">AddVisit</span>();<br />
+</p>
+          <p class="style11">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value = -value; <span class="style15">&nbsp;//
+            negate opponent's moves</span><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;}<br />
+          }</p></td>
+      </tr>
+    </table>
+    <p class="style7">Nodes with a known result do not have their value  updated as this  field holds the MC result (-1/0/1). <br /></p>
+    <p class="style12">Node Selection</p>
+    <p class="style7">The algorithm performs two distinct types of node selection:</p>
+    <p class="style7">&nbsp;&nbsp;&nbsp;      1) Child node selection during tree descent.  <br />
+&nbsp;&nbsp;&nbsp;      2) Root  selection of the best  available move after the  search has completed.</p>
+    <p class="style7"><span class="style8">1. Child Selection (During Search)</span><br />
+      The standard UCB calculation is used for selecting among child nodes during tree descent. Note that the estimated reward value for every second (non-owner) search ply is negated, as the opponent will be  trying to minimise the owner's reward.</p>
+    <table width="100%" align="center" cellspacing="12" bgcolor="#FFFFFF">
+      <tr>
+        <td><p class="style11"><span class="style15">//	Returns:<br />
+          //		&nbsp;&nbsp;&nbsp;&nbsp;Child node with the highest UCB priority.<br />
+          //</span><br />
+          <span class="style24">CNode</span>* <span class="style24">CMCTS</span>::UCBChoice(<span class="style24">CNode</span>* node)<br />
+          {<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="style24">CNode</span>* best_child = <span class="style17"> &nbsp;NULL</span>;<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;<span class="style17">float</span>&nbsp;best_value&nbsp;= <span class="style16">-1000.0</span>;<br />
+          <span class="style17">&nbsp;&nbsp;&nbsp;&nbsp;float</span>&nbsp;log_parent&nbsp;= &nbsp;log(node-&gt;<span class="style24">GetVisits</span>()); &nbsp;<span class="style15">// take log() outside loop</span></p>
+            <p class="style11">&nbsp;&nbsp;&nbsp;&nbsp;<span class="style17">for</span> (<span class="style24">CNode</span>* ptr = node-&gt;<span class="style24">GetChild</span>(); ptr != <span class="style17">NULL</span>; ptr = ptr-&gt;<span class="style24">GetNext</span>())<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;{<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style15">// Determine exploitation component (win rate)</span><br />
+              <span class="style17">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">float</span></span>&nbsp;exploit = ptr-&gt;<span class="style24">GetValue</span>();<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">if</span> (ptr-&gt;<span class="style24">IsKnown</span>())<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">if</span> (exploit == <span class="style24">MC_WIN</span>)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">return</span>&nbsp;ptr;<span class="style15">&nbsp;&nbsp;// always choose  winning move</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">else if</span> (exploit == <span class="style24">MC_LOSS</span>)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">continue</span>;<span class="style15">&nbsp;&nbsp;// don't choose  losing move</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">else</span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;exploit /= ptr-&gt;<span class="style24">GetVisits</span>();<span class="style15">&nbsp;&nbsp;// take average </span><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</p>
+            <p class="style11"><span class="style15">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="style15">// Determine exploration component (UCB)</span><br />
+              <span class="style17">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">float</span></span>&nbsp;explore = sqrt(log_parent / ptr-&gt;<span class="style24">GetVisits</span>());</p>
+            <p class="style11"><span class="style17">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">float</span></span>&nbsp;uct_value = exploit + m_C * explore;<br />
+              <span class="style17">&nbsp;&nbsp;</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">if</span> (uct_value &gt; best_value)<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;best_value = uct_value;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;best_child = ptr;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">return</span> best_child;<br />
+            }</p>
+          </td>
+      </tr>
+    </table>
+    <p class="style7">The UCB formula balances the exploration and exploitation terms to ensure that relatively unvisited   nodes are exercsised to ensure that their (low) values are reliable.</p>
+    <p class="style7">Note that  in this implementation nodes  are always visited on the iteration  in which they are created. This avoids possible division by 0 as <span class="style35">ptr-&gt;<span class="style24">GetVisits</span>()</span> will always be &gt;= 1.</p>
+    <p class="style7"><span class="style8">2. Root Selection (After Search)</span><br />
+      The following method selects the best move to make from among the root children after the search has completed. If a winning move is found, it is returned immediately.</p>
+    <table width="100%" align="center" cellspacing="12" bgcolor="#FFFFFF">
+      <tr>
+        <td><p class="style11"><span class="style15">//	Returns:<br />
+  //		&nbsp;&nbsp;&nbsp;&nbsp;Best child of the root node, which will be the  computer's move.<br />
+          //</span><br />
+          <span class="style24">CNode</span>* <span class="style24">CMCTS</span>::RootChoice(<span class="style24">CNode</span>* node)<br />
+          {<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;<span class="style24">CNode</span>* best_child = <span class="style34">NULL</span>;<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">float</span>&nbsp; best_value = <span class="style16">-1000.0f</span>;</p>
+          <p class="style11">&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">for</span> (<span class="style24">CNode</span>* ptr = node-&gt;<span class="style24">GetChild</span>(); ptr != <span class="style34">NULL</span>; ptr = ptr-&gt;<span class="style24">GetNext</span>())<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;{<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">if</span> (ptr-&gt;<span class="style24">IsKnown</span>() &amp;&amp; ptr-&gt;<span class="style24">GetValue</span>() == <span class="style24">MC_WIN</span>)<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">return</span> ptr;  <span class="style15">&nbsp;// winning move</span></p>
+          <p class="style11">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">if</span> (ptr-&gt;<span class="style24">GetVisits</span>() &gt; <span class="style16">0</span>)<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">float </span>value = ptr-&gt;<span class="style24">GetValue</span>();<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">if</span> (!ptr-&gt;<span class="style24">IsKnown</span>())<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;value /= ptr-&gt;<span class="style24">GetVisits</span>();<br />
+          </p>
+          <p class="style11"><span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if</span> (value &gt; best_value)<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;best_value&nbsp;= value;<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;best_child = ptr;<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;}<br />
+  &nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">return</span> best_child;<br />
+          }</p></td>
+      </tr>
+    </table>
+    <p><span class="style7">The node selection calculation is different for  this step  than during  tree descent as there is no need to encourage exploration; it is sufficient to  select the  root child with the highest average reward. This will typically (but not always!) be the most visited root child.<br />
+    </span></p>
+    <p class="style12">Referee </p>
+    <p class="style7">The referee class controls most aspects of  play including  the self-play trials. It is also  the conduit through which the user applies custom game and AI settings.</p>
+    <table width="100%" align="center" cellspacing="12" bgcolor="#FFFFFF">
+      <tr>
+        <td><p class="style11"><span class="style34">class</span> <span class="style27">CReferee</span><br />
+          {<br />
+          <span class="style34">public</span>:<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;CReferee(<span class="style24">CGame</span>* game);<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;~CReferee(<span class="style34">void</span>);</p>
+            <p class="style11">&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">void</span>&nbsp;&nbsp;&nbsp;MainLoop(<span class="style34">void</span>);<br />
+              <br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24"><span class="style34">int</span></span> &nbsp;&nbsp;&nbsp;BestAIMove(<span class="style34">void</span>) <span class="style34">const</span>;<br />
+<br />
+              <span class="style24"></span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24"><span class="style34">int</span></span> &nbsp;&nbsp;&nbsp;PlayNewGame(<span class="style34">int</span> starter, <span class="style34">int</span> ballot_size);<br />
+              <span class="style24"></span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24"><span class="style34">int</span></span> &nbsp;&nbsp;&nbsp;Run(<span class="style34">int</span> num_trials);<br />
+              <span class="style24"></span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24"><span class="style34">int</span></span> &nbsp;&nbsp;&nbsp;TimePlayouts(<span class="style34">int</span> seconds);<br />
+            </p>
+            <p class="style11"><span class="style34">private<span class="style27">:</span></span><br />
+                <span class="style15">&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24">CGame</span>* <span class="style24">m_Game</span>;&nbsp;&nbsp;// the game object<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="style24">CMCTS</span>* <span class="style24">m_MCTS</span>;&nbsp;&nbsp;// the search object<br />
+<br />
+&nbsp;&nbsp;&nbsp;&nbsp;// Various data members: AI settings, self-play results, etc.</span><br />
+};</p></td>
+      </tr>
+    </table>
+    <p><span class="style7">The ballot_size is  the number of random moves made at the start of each self-play game, referred to as the  <em>opening ballot</em>. This  encourages a broader  search of the move space and stops the  AI from following the same preferred line of play  every time. The ballot size is set to 2 for all self-play games.<br />
+    </span></p>
+    <p class="style12">Search Time</p>
+    <p class="style7">The basic implemention  achieves 100,000 UCT iterations  per second for  10x10 Gomoku on a Macbook Pro <em>i</em>5.</p>
+    <p class="style7">An interesting question is how long the MCTS  search should run to achieve a  desired level of play. There is currently little known research into this question, but we  observe that MCTS  does not yield truly intelligent moves until around 100,000 iterations for  10x10 Gomoku using the basic  algorithm without  enhancement. In this context, we generously define &quot;intelligent&quot; as moves that would trouble a human novice.</p>
+    <p class="style7">For 10x10 Gomoku the following  rule of thumb seems plausible:<br />
+    </p>
+    <p class="style7">&nbsp;&nbsp;&nbsp;&nbsp; <em>At least 1,000 iterations per available move</em></p>
+    <p class="style7">which gives the desired 100,000 iterations for an empty 10x10 board with 100 available moves. However, this is unlikely to be a reliable  yardstick for all games; it would be overkill for a trivial game such as Tic Tac Toe and insufficient for a complex game such as Go. A measure of the game's complexity and strategic depth should be incorporated, but these are hard to measure.<br /></p>
+    <p class="style12">Download</p>
+    <p class="style7">The full C++ implementation  is available [[here soon]].</p>
+    <p class="style7"><span class="style8">Platforms</span><br />
+      The code has been tested on Mac OS X and Windows XP and Vista, but should presumably work in any  environment that supports the g++ compiler. </p>
+    <p class="style7"><span class="style8">Compilation</span><br />
+To compile with gpp, unpack the source files to a directory and  run &quot;make&quot; in that directory. An XCode project file is also provided (Run &gt; Console for output).</p>
+    <p class="style7"><span class="style8">Usage</span><br />
+Launch the application then at the prompt enter &quot;run&quot; to start a self-play game between two default MCTS agents. Hit return to interrupt the current search. Enter &quot;?&quot; for available options.</p>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

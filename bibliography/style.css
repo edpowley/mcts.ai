@@ -1,0 +1,137 @@
+.style3 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	color: #666666;
+}
+.style6 {
+	font-size: 44px;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #666666;
+}
+.style7 {
+	font-family: Arial, Helvetica, sans-serif;
+	color: #333333;
+}
+a:link {
+	color: #CC6600;
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+	color: #993333;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+.style8 {color: #666666; font-family: Arial, Helvetica, sans-serif;}
+.menuitem {color: #666666; font-family: Arial, Helvetica, sans-serif;}
+
+div.loading {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: larger;
+	text-align: center;
+}
+
+ul,ol {
+	font-family: Arial, Helvetica, sans-serif;
+	padding-left: 3em;
+}
+
+ul {
+	list-style: none;
+}
+
+ol {
+  counter-reset: list;
+}
+
+ol > li {
+	list-style: none;
+}
+
+ol > li:before {
+	content: "[" counter(list) "]";
+	counter-increment: list;
+	float: left;
+	width: 2.2em;
+	text-align: right;
+	margin-left: -2.6em;
+}
+
+li {
+	padding: 0.5ex;
+	margin-bottom: 1ex;
+}
+
+img.icon {
+	float: left;
+	padding-top: 0.5em;
+	height: 2em;
+	margin-left: -2.5em;
+}
+
+/*div.authorlist {
+	margin-top: -2.1ex;
+}*/
+
+div.title {
+	font-weight: bold;
+}
+
+a.author {
+	cursor: pointer;
+}
+
+a.author:hover {
+	color: red;
+}
+
+span.journalname {
+	font-style: italic;
+}
+
+span.conferencename {
+	font-style: italic;
+}
+
+span.bookname {
+	font-style: italic;
+}
+
+ul.links {
+	padding-left: 0px;
+	margin: 1ex;
+}
+
+ul.links li {
+	display: inline;
+	margin-right: 1ex;
+	background: #CC6600;
+	color: white;
+}
+
+ul.links li a{
+	color: white;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+ul.links li a:hover{
+	text-decoration: underline;
+}
+
+pre.bibtex {
+	padding: 1ex;
+	border: 1px solid black;
+	background: white;
+}
+
+.error {
+	background: red;
+	color: white;
+	font-weight: bold;
+}

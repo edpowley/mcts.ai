@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Monte Carlo Tree Search - Java Code</title>
+<style type="text/css">
+<!--
+.style3 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	color: #666666;
+}
+.style6 {
+	font-size: 44px;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #666666;
+}
+.style7 {
+	font-family: Arial, Helvetica, sans-serif;
+	color: #333333;
+}
+a:link {
+	color: #CC6600;
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+	color: #993333;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+.style8 {
+	font-size: large;
+	font-weight: bold;
+}
+.style11 {
+	font-size: small;
+	color: #000000;
+	font-family: "Courier New", Courier, monospace;
+}
+.style15 {color: #009900}
+.style16 {color: #0000FF}
+.style17 {color: #CC0099}
+.style24 {color: #006666}
+.style27 {color: #000000}
+.style31 {color: #CC0000}
+.style34 {color: #CC0099}
+.style12 {font-family: Arial, Helvetica, sans-serif; color: #666666; font-size: xx-large;}
+.style35 {font-family: "Courier New", Courier, monospace; color: #000000;}
+.style37 {color: #666666; font-family: Arial, Helvetica, sans-serif;}
+.style38 {
+	font-family: "Courier New", Courier, monospace;
+	font-size: small;
+}
+-->
+</style>
+</head>
+
+<body>
+<table width="95%" border="0" cellpadding="16" cellspacing="0">
+  <tr>
+    <td width="149"><div align="center"><img src="../logo/mcts-logo-36a.png" width="150" height="36" /></div></td>
+    <td class="style6">Java Code</td>
+  </tr>
+  <tr>
+    <td valign="top"><p align="center">      <span class="style37"><a href="../index.html">Home</a></span></p>
+      <p align="center" class="style37"><a href="../about/index.html">About</a></p>
+    <p align="center" class="style37"><a href="../tutorial/index.html">Tutorial</a></p>
+    <p align="center" class="style37"><a href="../code/index.html">Code</a></p>
+    <p align="center" class="style37"><a href="../bibliography/index.html">Bibliography</a></p>
+    <p align="center" class="style37"><a href="../resources/index.html">Resources</a></p>
+    <p align="center"><span class="style37"><a href="../project/index.html">Project</a></span><span class="style3"><br />
+    </span></p></td>
+    <td valign="top" bordercolor="#FF6600" bgcolor="#FFF5D7">
+      <p class="style7"> The following Java code shows a minimal one-page MCTS implementation by Simon Lucas. <br />
+      This code is strictly tutorial in nature (a simple toin coss is used for each playout)  but it   demonstrates  the operation of the algorithm.</p>
+      <table width="100%" align="center" cellspacing="12" bgcolor="#FFFFFF">
+        <tr>
+          <td><p class="style38"><span class="style34">import</span> java.util.LinkedList;<br />
+              <span class="style34">import</span> java.util.List;<br />
+              <span class="style34">import</span> java.util.Random;</p>
+            <p class="style38"><span class="style34">public class</span> TreeNode {<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;static</span> Random <span class="style16"><em>r</em></span> = <span class="style34">new</span> Random();<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;static int</span> <span class="style16"><em>nActions</em></span> = 5;<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;static double</span> <span class="style16"><em>epsilon</em></span> = 1e-6;</p>
+            <p class="style38"> &nbsp;&nbsp;&nbsp;&nbsp;TreeNode[] <span class="style16">children</span>;<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;double</span> <span class="style16">nVisits</span>, <span class="style16">totValue</span>;</p>
+            <p class="style38"> <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;public void</span> selectAction() {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;List&lt;TreeNode&gt; visited = <span class="style34">new</span> LinkedList&lt;TreeNode&gt;();<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TreeNode cur = <span class="style34">this</span>;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;visited.add(<span class="style34">this</span>);<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;while</span> (!cur.isLeaf()) {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cur = cur.select();<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;visited.add(cur);<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;cur.expand();<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TreeNode newNode = cur.select();<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;visited.add(newNode);<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;double </span>value = rollOut(newNode);<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for</span> (TreeNode node : visited) {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style15">&nbsp;// would need extra logic for n-player game</span><br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;node.updateStats(value);<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;}</p>
+            <p class="style38"> <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;public void</span> expand() {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style16">children</span> = <span class="style34">new</span> TreeNode[<span class="style16"><em>nActions</em></span>];<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for</span> (<span class="style34">int</span> i=0; i&lt;<span class="style16"><em>nActions</em></span>; i++) {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style16">children</span>[i] = <span class="style34">new</span> TreeNode();<br />
+              &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;}<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;}</p>
+            <p class="style38"> <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;private</span> TreeNode select() {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TreeNode selected = <span class="style34">null</span>;<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;double</span> bestValue = Double.<span class="style16"><em>MIN_VALUE</em></span>;<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;for</span> (TreeNode c : <span class="style16">children</span>) {<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;double</span> uctValue = c.<span class="style16">totValue</span> / (c.<span class="style16">nVisits</span> + <span class="style16"><em>epsilon</em></span>) +<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Math.<em>sqrt</em>(Math.<em>log</em>(<span class="style16">nVisits</span>+1) / (c.<span class="style16">nVisits</span> + <span class="style16"><em>epsilon</em></span>)) +<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style16"><em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;r</em></span>.nextDouble() * <span class="style16"><em>epsilon</em></span>;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style15">// small random number to break ties randomly in unexpanded nodes</span><br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">if</span> (uctValue &gt; bestValue) {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;selected = c;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bestValue = uctValue;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style34">return</span> selected;<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;}</p>
+            <p class="style38"><span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;public boolean</span> isLeaf() {<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return</span> <span class="style16">children</span> == <span class="style34">null</span>;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}</p>
+            <p class="style38"> <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;public</span> <span class="style34">double</span> rollOut(TreeNode tn) {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style15">&nbsp;// ultimately a roll out will end in some value<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// assume for now that it ends in a win or a loss<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// and just return this at random</span><br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return</span> <span class="style16"><em>r</em></span>.nextInt(2);<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;}</p>
+            <p class="style38"> <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;public void</span> updateStats(<span class="style34">double</span> value) {<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style16">nVisits</span>++;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style16">totValue</span> += value;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;}</p>
+            <p class="style38"> <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;public int</span> arity() {<br />
+              <span class="style34">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return</span> <span class="style16">children</span> == <span class="style34">null</span> ? 0 : <span class="style16">children.length</span>;<br />
+              &nbsp;&nbsp;&nbsp;&nbsp;}<br />
+              }</p>            
+            </td>
+        </tr>
+      </table>
+      <p><span class="style7">The complete Java code for this example can be downloaded <a href="mcts-java-1.zip">here</a>.<br />
+      </span><br />
+      </p>
+      <hr noshade="noshade" />
+      <p class="style12">&nbsp;</p>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

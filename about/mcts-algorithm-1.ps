@@ -1,0 +1,129 @@
+%!PS-Adobe-3.0 
+%%Creator: Cameron Browne 
+%%Title: crap-10.ps 
+%%CreationDate: November 2005 
+%%BoundingBox: 0 0 595 657 
+%%Pages: 1 
+%%Page: 1 1 
+%%EndComments 
+ 
+%-------------- Constants -------------- 
+ 
+/Unit 60 def 
+ 
+%----------------------------------------------- 
+ 
+/Arrow 
+{   % call: i0 j0 angle length width Arrow 
+    5 dict begin 
+    /width exch def 
+    /length exch def 
+    /angle exch def 
+    /y0 exch def 
+    /x0 exch def 
+ 
+    % set up the graphics state 
+    gsave 
+    %i0 Unit mul j0 Unit mul translate 
+    x0 y0 translate 
+    angle rotate 
+    0 setgray 
+ 
+    % draw the arrow head 
+    0 setlinewidth 
+    newpath 
+    length Unit 2 div sub 0 moveto 
+    width 7 mul neg width 3.0 mul rlineto 
+    width 1 mul width 3.0 mul neg rlineto 
+    width 1 mul neg width 3.0 mul neg rlineto 
+    closepath 
+    fill 
+ 
+    % draw the arrow shaft 
+    width 2 div setlinewidth 
+    newpath 
+    0 0 moveto  %Unit 2 div 0 moveto 
+    %length Unit sub width 3 mul sub 0 rlineto 
+    length Unit 1.9 div sub 0 rlineto 
+    stroke 
+ 
+    grestore 
+    end 
+} def 
+
+%---------------- Main program ----------------- 
+ 
+0 150 translate 
+
+%1 1 scale 
+
+1 setlinejoin 
+1 setlinecap 
+
+1 setlinewidth
+ 
+/font_size 32 def
+
+/box_wd 75 def
+/box_ht 35 def
+
+/r 40 def
+
+/Arial-Bold findfont font_size scalefont setfont 
+
+%---------------------- Tree area fill ------------------------
+
+gsave
+
+newpath
+300 600 moveto
+120 260 lineto 180 240 lineto 240 265 lineto 
+300 235 lineto 
+360 260 lineto 420 235 lineto 480 275 lineto
+closepath 
+.5 setlinewidth
+0.9 setgray fill 
+
+newpath
+120 260 moveto 300 600 lineto 480 275 lineto
+0 setgray stroke
+
+newpath
+120 260 moveto 180 240 lineto 240 265 lineto 
+300 235 lineto 
+360 260 lineto 420 235 lineto 480 275 lineto
+0 setgray 2 setlinewidth [0 8] 0 setdash stroke
+
+grestore
+
+%---------------------- Tree nodes ------------------------
+
+2 setlinewidth
+
+%-------- R --------
+
+newpath
+300 600 moveto
+315 510 lineto
+285 465 lineto
+345 420 lineto
+280 375 lineto
+300 285 lineto
+
+300 190 lineto
+
+280  98 lineto
+320  45 lineto
+280 -10 lineto
+300 -100 lineto
+
+stroke
+
+newpath 300 600 r 0 360 arc gsave 1 1 .5 setrgbcolor fill grestore 0 setgray stroke
+%newpath 300 285 r 0 360 arc gsave 1 1 .5 setrgbcolor fill grestore 0 setgray stroke
+%newpath 300 190 r 0 360 arc gsave 1 1 .5 setrgbcolor fill grestore 0 setgray stroke
+newpath 300 -100 r 0 360 arc gsave 1 1 .5 setrgbcolor fill grestore 0 setgray stroke
+
+%-----
+
+showpage 

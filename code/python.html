@@ -1,0 +1,541 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Monte Carlo Tree Search - Python Code</title>
+<style type="text/css">
+<!--
+.style3 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	color: #666666;
+}
+.style6 {
+	font-size: 44px;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #666666;
+}
+.style7 {
+	font-family: Arial, Helvetica, sans-serif;
+	color: #333333;
+}
+a:link {
+	color: #CC6600;
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+	color: #993333;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+.style8 {
+	font-size: large;
+	font-weight: bold;
+}
+.style11 {
+	font-size: small;
+	color: #000000;
+	font-family: "Courier New", Courier, monospace;
+}
+.style15 {color: #009900}
+.style16 {color: #0000FF}
+.style17 {color: #CC0099}
+.style24 {color: #006666}
+.style27 {color: #000000}
+.style31 {color: #CC0000}
+.style34 {color: #CC0099}
+.style12 {font-family: Arial, Helvetica, sans-serif; color: #666666; font-size: xx-large;}
+.style35 {font-family: "Courier New", Courier, monospace; color: #000000;}
+.style37 {color: #666666; font-family: Arial, Helvetica, sans-serif;}
+.style38 {
+	font-family: "Courier New", Courier, monospace;
+	font-size: small;
+}
+
+.sc0 {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	color: #000000;
+}
+.sc1 {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	color: #008000;
+}
+.sc2 {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	color: #FF0000;
+}
+.sc3 {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	color: #808080;
+}
+.sc5 {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	font-weight: bold;
+	color: #0000FF;
+}
+.sc7 {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	color: #000000;
+}
+.sc8 {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	color: #000000;
+	font-weight: bold;
+}
+.sc9 {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	color: #FF00FF;
+}
+.sc10 {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	font-weight: bold;
+	color: #000080;
+}
+.sc11 {
+	font-family: 'Courier New';
+	font-size: 10pt;
+	color: #000000;
+}
+-->
+</style>
+</head>
+
+<body>
+<table width="95%" border="0" cellpadding="16" cellspacing="0">
+  <tr>
+    <td width="149"><div align="center"><img src="../logo/mcts-logo-36a.png" width="150" height="36" /></div></td>
+    <td class="style6">Python Code</td>
+  </tr>
+  <tr>
+    <td valign="top"><p align="center">      <span class="style37"><a href="../index.html">Home</a></span></p>
+      <p align="center" class="style37"><a href="../about/index.html">About</a></p>
+    <p align="center" class="style37"><a href="../tutorial/index.html">Tutorial</a></p>
+    <p align="center" class="style37"><a href="../code/index.html">Code</a></p>
+    <p align="center" class="style37"><a href="../bibliography/index.html">Bibliography</a></p>
+    <p align="center" class="style37"><a href="../resources/index.html">Resources</a></p>
+    <p align="center"><span class="style37"><a href="../project/index.html">Project</a></span><span class="style3"><br />
+    </span></p></td>
+    <td valign="top" bordercolor="#FF6600" bgcolor="#FFF5D7">
+      <table width="100%" align="center" cellspacing="12" bgcolor="#FFFFFF">
+        <tr>
+          <td>
+<div style="float: left; white-space: pre; line-height: 1; background: #FFFFFF; "><span class="sc1"># This is a very simple implementation of the UCT Monte Carlo Tree Search algorithm in Python 2.7.</span><span class="sc0">
+</span><span class="sc1"># The function UCT(rootstate, itermax, verbose = False) is towards the bottom of the code.</span><span class="sc0">
+</span><span class="sc1"># It aims to have the clearest and simplest possible code, and for the sake of clarity, the code</span><span class="sc0">
+</span><span class="sc1"># is orders of magnitude less efficient than it could be made, particularly by using a </span><span class="sc0">
+</span><span class="sc1"># state.GetRandomMove() or state.DoRandomRollout() function.</span><span class="sc0">
+</span><span class="sc1"># </span><span class="sc0">
+</span><span class="sc1"># Example GameState classes for Nim, OXO and Othello are included to give some idea of how you</span><span class="sc0">
+</span><span class="sc1"># can write your own GameState use UCT in your 2-player game. Change the game to be played in </span><span class="sc0">
+</span><span class="sc1"># the UCTPlayGame() function at the bottom of the code.</span><span class="sc0">
+</span><span class="sc1"># </span><span class="sc0">
+</span><span class="sc1"># Written by Peter Cowling, Ed Powley, Daniel Whitehouse (University of York, UK) September 2012.</span><span class="sc0">
+</span><span class="sc1"># </span><span class="sc0">
+</span><span class="sc1"># Licence is granted to freely use and distribute for any sensible/legal purpose so long as this comment</span><span class="sc0">
+</span><span class="sc1"># remains in any distributed code.</span><span class="sc0">
+</span><span class="sc1"># </span><span class="sc0">
+</span><span class="sc1"># For more information about Monte Carlo Tree Search check out our web site at www.mcts.ai</span><span class="sc0">
+
+</span><span class="sc5">from</span><span class="sc0"> </span><span class="sc11">math</span><span class="sc0"> </span><span class="sc5">import</span><span class="sc0"> </span><span class="sc10">*</span><span class="sc0">
+</span><span class="sc5">import</span><span class="sc0"> </span><span class="sc11">random</span><span class="sc0">
+
+</span><span class="sc5">class</span><span class="sc0"> </span><span class="sc8">GameState</span><span class="sc10">:</span><span class="sc0">
+    </span><span class="sc7">""" A state of the game, i.e. the game board. These are the only functions which are
+        absolutely necessary to implement UCT in any 2-player complete information deterministic 
+        zero-sum game, although they can be enhanced and made quicker, for example by using a 
+        GetRandomMove() function to generate a random move during rollout.
+        By convention the players are numbered 1 and 2.
+    """</span><span class="sc0">
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">__init__</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+            </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc2">2</span><span class="sc0"> </span><span class="sc1"># At the root pretend the player just moved is player 2 - player 1 has the first move</span><span class="sc0">
+        
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">Clone</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Create a deep clone of this game state.
+        """</span><span class="sc0">
+        </span><span class="sc11">st</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">GameState</span><span class="sc10">()</span><span class="sc0">
+        </span><span class="sc11">st</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">st</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">DoMove</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">move</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Update a state by carrying out the given move.
+            Must update playerJustMoved.
+        """</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc2">3</span><span class="sc0"> </span><span class="sc10">-</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0">
+        
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">GetMoves</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Get all possible moves from this state.
+        """</span><span class="sc0">
+    
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">GetResult</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">playerjm</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Get the game result from the viewpoint of playerjm. 
+        """</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">__repr__</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Don't need this - but good style.
+        """</span><span class="sc0">
+        </span><span class="sc5">pass</span><span class="sc0">
+
+
+</span><span class="sc5">class</span><span class="sc0"> </span><span class="sc8">NimState</span><span class="sc10">:</span><span class="sc0">
+    </span><span class="sc7">""" A state of the game Nim. In Nim, players alternately take 1,2 or 3 chips with the 
+        winner being the player to take the last chip. 
+        In Nim any initial state of the form 4n+k for k = 1,2,3 is a win for player 1
+        (by choosing k) chips.
+        Any initial state of the form 4n is a win for player 2.
+    """</span><span class="sc0">
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">__init__</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">ch</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc2">2</span><span class="sc0"> </span><span class="sc1"># At the root pretend the player just moved is p2 - p1 has the first move</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">chips</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">ch</span><span class="sc0">
+        
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">Clone</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Create a deep clone of this game state.
+        """</span><span class="sc0">
+        </span><span class="sc11">st</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">NimState</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">chips</span><span class="sc10">)</span><span class="sc0">
+        </span><span class="sc11">st</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">st</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">DoMove</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">move</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Update a state by carrying out the given move.
+            Must update playerJustMoved.
+        """</span><span class="sc0">
+        </span><span class="sc5">assert</span><span class="sc0"> </span><span class="sc11">move</span><span class="sc0"> </span><span class="sc10">&gt;=</span><span class="sc0"> </span><span class="sc2">1</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">move</span><span class="sc0"> </span><span class="sc10">&lt;=</span><span class="sc0"> </span><span class="sc2">3</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">move</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">int</span><span class="sc10">(</span><span class="sc11">move</span><span class="sc10">)</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">chips</span><span class="sc0"> </span><span class="sc10">-=</span><span class="sc0"> </span><span class="sc11">move</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc2">3</span><span class="sc0"> </span><span class="sc10">-</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0">
+        
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">GetMoves</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Get all possible moves from this state.
+        """</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">range</span><span class="sc10">(</span><span class="sc2">1</span><span class="sc10">,</span><span class="sc11">min</span><span class="sc10">([</span><span class="sc2">4</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">chips</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc2">1</span><span class="sc10">]))</span><span class="sc0">
+    
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">GetResult</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">playerjm</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Get the game result from the viewpoint of playerjm. 
+        """</span><span class="sc0">
+        </span><span class="sc5">assert</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">chips</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc2">0</span><span class="sc0">
+        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">playerjm</span><span class="sc10">:</span><span class="sc0">
+            </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc2">1.0</span><span class="sc0"> </span><span class="sc1"># playerjm took the last chip and has won</span><span class="sc0">
+        </span><span class="sc5">else</span><span class="sc10">:</span><span class="sc0">
+            </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc2">0.0</span><span class="sc0"> </span><span class="sc1"># playerjm's opponent took the last chip and has won</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">__repr__</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc11">s</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc3">"Chips:"</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc11">str</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">chips</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc3">" JustPlayed:"</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc11">str</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc10">)</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">s</span><span class="sc0">
+
+</span><span class="sc5">class</span><span class="sc0"> </span><span class="sc8">OXOState</span><span class="sc10">:</span><span class="sc0">
+    </span><span class="sc7">""" A state of the game, i.e. the game board.
+        Squares in the board are in this arrangement
+        012
+        345
+        678
+        where 0 = empty, 1 = player 1 (X), 2 = player 2 (O)
+    """</span><span class="sc0">
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">__init__</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc2">2</span><span class="sc0"> </span><span class="sc1"># At the root pretend the player just moved is p2 - p1 has the first move</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc10">[</span><span class="sc2">0</span><span class="sc10">,</span><span class="sc2">0</span><span class="sc10">,</span><span class="sc2">0</span><span class="sc10">,</span><span class="sc2">0</span><span class="sc10">,</span><span class="sc2">0</span><span class="sc10">,</span><span class="sc2">0</span><span class="sc10">,</span><span class="sc2">0</span><span class="sc10">,</span><span class="sc2">0</span><span class="sc10">,</span><span class="sc2">0</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc1"># 0 = empty, 1 = player 1, 2 = player 2</span><span class="sc0">
+        
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">Clone</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Create a deep clone of this game state.
+        """</span><span class="sc0">
+        </span><span class="sc11">st</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">OXOState</span><span class="sc10">()</span><span class="sc0">
+        </span><span class="sc11">st</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0">
+        </span><span class="sc11">st</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[:]</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">st</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">DoMove</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">move</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Update a state by carrying out the given move.
+            Must update playerToMove.
+        """</span><span class="sc0">
+        </span><span class="sc5">assert</span><span class="sc0"> </span><span class="sc11">move</span><span class="sc0"> </span><span class="sc10">&gt;=</span><span class="sc0"> </span><span class="sc2">0</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">move</span><span class="sc0"> </span><span class="sc10">&lt;=</span><span class="sc0"> </span><span class="sc2">8</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">move</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">int</span><span class="sc10">(</span><span class="sc11">move</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">move</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc2">0</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc2">3</span><span class="sc0"> </span><span class="sc10">-</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">move</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0">
+        
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">GetMoves</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Get all possible moves from this state.
+        """</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc10">[</span><span class="sc11">i</span><span class="sc0"> </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">i</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">range</span><span class="sc10">(</span><span class="sc2">9</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">i</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc2">0</span><span class="sc10">]</span><span class="sc0">
+    
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">GetResult</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">playerjm</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Get the game result from the viewpoint of playerjm. 
+        """</span><span class="sc0">
+        </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">,</span><span class="sc11">z</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc10">[(</span><span class="sc2">0</span><span class="sc10">,</span><span class="sc2">1</span><span class="sc10">,</span><span class="sc2">2</span><span class="sc10">),(</span><span class="sc2">3</span><span class="sc10">,</span><span class="sc2">4</span><span class="sc10">,</span><span class="sc2">5</span><span class="sc10">),(</span><span class="sc2">6</span><span class="sc10">,</span><span class="sc2">7</span><span class="sc10">,</span><span class="sc2">8</span><span class="sc10">),(</span><span class="sc2">0</span><span class="sc10">,</span><span class="sc2">3</span><span class="sc10">,</span><span class="sc2">6</span><span class="sc10">),(</span><span class="sc2">1</span><span class="sc10">,</span><span class="sc2">4</span><span class="sc10">,</span><span class="sc2">7</span><span class="sc10">),(</span><span class="sc2">2</span><span class="sc10">,</span><span class="sc2">5</span><span class="sc10">,</span><span class="sc2">8</span><span class="sc10">),(</span><span class="sc2">0</span><span class="sc10">,</span><span class="sc2">4</span><span class="sc10">,</span><span class="sc2">8</span><span class="sc10">),(</span><span class="sc2">2</span><span class="sc10">,</span><span class="sc2">4</span><span class="sc10">,</span><span class="sc2">6</span><span class="sc10">)]:</span><span class="sc0">
+            </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">x</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">y</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">z</span><span class="sc10">]:</span><span class="sc0">
+                </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">x</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">playerjm</span><span class="sc10">:</span><span class="sc0">
+                    </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc2">1.0</span><span class="sc0">
+                </span><span class="sc5">else</span><span class="sc10">:</span><span class="sc0">
+                    </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc2">0.0</span><span class="sc0">
+        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">GetMoves</span><span class="sc10">()</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc10">[]:</span><span class="sc0"> </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc2">0.5</span><span class="sc0"> </span><span class="sc1"># draw</span><span class="sc0">
+        </span><span class="sc5">assert</span><span class="sc0"> </span><span class="sc5">False</span><span class="sc0"> </span><span class="sc1"># Should not be possible to get here</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">__repr__</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc11">s</span><span class="sc10">=</span><span class="sc0"> </span><span class="sc3">""</span><span class="sc0">
+        </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">i</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">range</span><span class="sc10">(</span><span class="sc2">9</span><span class="sc10">):</span><span class="sc0"> 
+            </span><span class="sc11">s</span><span class="sc0"> </span><span class="sc10">+=</span><span class="sc0"> </span><span class="sc3">".XO"</span><span class="sc10">[</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">i</span><span class="sc10">]]</span><span class="sc0">
+            </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">i</span><span class="sc0"> </span><span class="sc10">%</span><span class="sc0"> </span><span class="sc2">3</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc2">2</span><span class="sc10">:</span><span class="sc0"> </span><span class="sc11">s</span><span class="sc0"> </span><span class="sc10">+=</span><span class="sc0"> </span><span class="sc3">"\n"</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">s</span><span class="sc0">
+
+</span><span class="sc5">class</span><span class="sc0"> </span><span class="sc8">OthelloState</span><span class="sc10">:</span><span class="sc0">
+    </span><span class="sc7">""" A state of the game of Othello, i.e. the game board.
+        The board is a 2D array where 0 = empty (.), 1 = player 1 (X), 2 = player 2 (O).
+        In Othello players alternately place pieces on a square board - each piece played
+        has to sandwich opponent pieces between the piece played and pieces already on the 
+        board. Sandwiched pieces are flipped.
+        This implementation modifies the rules to allow variable sized square boards and
+        terminates the game as soon as the player about to move cannot make a move (whereas
+        the standard game allows for a pass move). 
+    """</span><span class="sc0">
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">__init__</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc11">sz</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc2">8</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc2">2</span><span class="sc0"> </span><span class="sc1"># At the root pretend the player just moved is p2 - p1 has the first move</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc10">[]</span><span class="sc0"> </span><span class="sc1"># 0 = empty, 1 = player 1, 2 = player 2</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">size</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">sz</span><span class="sc0">
+        </span><span class="sc5">assert</span><span class="sc0"> </span><span class="sc11">sz</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">int</span><span class="sc10">(</span><span class="sc11">sz</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">sz</span><span class="sc0"> </span><span class="sc10">%</span><span class="sc0"> </span><span class="sc2">2</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc2">0</span><span class="sc0"> </span><span class="sc1"># size must be integral and even</span><span class="sc0">
+        </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">y</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">range</span><span class="sc10">(</span><span class="sc11">sz</span><span class="sc10">):</span><span class="sc0">
+            </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">.</span><span class="sc11">append</span><span class="sc10">([</span><span class="sc2">0</span><span class="sc10">]*</span><span class="sc11">sz</span><span class="sc10">)</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">sz</span><span class="sc10">/</span><span class="sc2">2</span><span class="sc10">][</span><span class="sc11">sz</span><span class="sc10">/</span><span class="sc2">2</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">sz</span><span class="sc10">/</span><span class="sc2">2</span><span class="sc10">-</span><span class="sc2">1</span><span class="sc10">][</span><span class="sc11">sz</span><span class="sc10">/</span><span class="sc2">2</span><span class="sc10">-</span><span class="sc2">1</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc2">1</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">sz</span><span class="sc10">/</span><span class="sc2">2</span><span class="sc10">][</span><span class="sc11">sz</span><span class="sc10">/</span><span class="sc2">2</span><span class="sc10">-</span><span class="sc2">1</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">sz</span><span class="sc10">/</span><span class="sc2">2</span><span class="sc10">-</span><span class="sc2">1</span><span class="sc10">][</span><span class="sc11">sz</span><span class="sc10">/</span><span class="sc2">2</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc2">2</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">Clone</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Create a deep clone of this game state.
+        """</span><span class="sc0">
+        </span><span class="sc11">st</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">OthelloState</span><span class="sc10">()</span><span class="sc0">
+        </span><span class="sc11">st</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0">
+        </span><span class="sc11">st</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc10">[</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">i</span><span class="sc10">][:]</span><span class="sc0"> </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">i</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">range</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">size</span><span class="sc10">)]</span><span class="sc0">
+        </span><span class="sc11">st</span><span class="sc10">.</span><span class="sc11">size</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">size</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">st</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">DoMove</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">move</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Update a state by carrying out the given move.
+            Must update playerToMove.
+        """</span><span class="sc0">
+        </span><span class="sc10">(</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">)=(</span><span class="sc11">move</span><span class="sc10">[</span><span class="sc2">0</span><span class="sc10">],</span><span class="sc11">move</span><span class="sc10">[</span><span class="sc2">1</span><span class="sc10">])</span><span class="sc0">
+        </span><span class="sc5">assert</span><span class="sc0"> </span><span class="sc11">x</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">int</span><span class="sc10">(</span><span class="sc11">x</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">y</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">int</span><span class="sc10">(</span><span class="sc11">y</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">IsOnBoard</span><span class="sc10">(</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">x</span><span class="sc10">][</span><span class="sc11">y</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc2">0</span><span class="sc0">
+        </span><span class="sc11">m</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">GetAllSandwichedCounters</span><span class="sc10">(</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">)</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc2">3</span><span class="sc0"> </span><span class="sc10">-</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">x</span><span class="sc10">][</span><span class="sc11">y</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0">
+        </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">a</span><span class="sc10">,</span><span class="sc11">b</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">m</span><span class="sc10">:</span><span class="sc0">
+            </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">a</span><span class="sc10">][</span><span class="sc11">b</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0">
+    
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">GetMoves</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Get all possible moves from this state.
+        """</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc10">[(</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">x</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">range</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">size</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">y</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">range</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">size</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">x</span><span class="sc10">][</span><span class="sc11">y</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc2">0</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">ExistsSandwichedCounter</span><span class="sc10">(</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">)]</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">AdjacentToEnemy</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Speeds up GetMoves by only considering squares which are adjacent to an enemy-occupied square.
+        """</span><span class="sc0">
+        </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">dx</span><span class="sc10">,</span><span class="sc11">dy</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc10">[(</span><span class="sc2">0</span><span class="sc10">,+</span><span class="sc2">1</span><span class="sc10">),(+</span><span class="sc2">1</span><span class="sc10">,+</span><span class="sc2">1</span><span class="sc10">),(+</span><span class="sc2">1</span><span class="sc10">,</span><span class="sc2">0</span><span class="sc10">),(+</span><span class="sc2">1</span><span class="sc10">,-</span><span class="sc2">1</span><span class="sc10">),(</span><span class="sc2">0</span><span class="sc10">,-</span><span class="sc2">1</span><span class="sc10">),(-</span><span class="sc2">1</span><span class="sc10">,-</span><span class="sc2">1</span><span class="sc10">),(-</span><span class="sc2">1</span><span class="sc10">,</span><span class="sc2">0</span><span class="sc10">),(-</span><span class="sc2">1</span><span class="sc10">,+</span><span class="sc2">1</span><span class="sc10">)]:</span><span class="sc0">
+            </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">IsOnBoard</span><span class="sc10">(</span><span class="sc11">x</span><span class="sc10">+</span><span class="sc11">dx</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">+</span><span class="sc11">dy</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">x</span><span class="sc10">+</span><span class="sc11">dx</span><span class="sc10">][</span><span class="sc11">y</span><span class="sc10">+</span><span class="sc11">dy</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc10">:</span><span class="sc0">
+                </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc5">True</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc5">False</span><span class="sc0">
+    
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">AdjacentEnemyDirections</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Speeds up GetMoves by only considering squares which are adjacent to an enemy-occupied square.
+        """</span><span class="sc0">
+        </span><span class="sc11">es</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc10">[]</span><span class="sc0">
+        </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">dx</span><span class="sc10">,</span><span class="sc11">dy</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc10">[(</span><span class="sc2">0</span><span class="sc10">,+</span><span class="sc2">1</span><span class="sc10">),(+</span><span class="sc2">1</span><span class="sc10">,+</span><span class="sc2">1</span><span class="sc10">),(+</span><span class="sc2">1</span><span class="sc10">,</span><span class="sc2">0</span><span class="sc10">),(+</span><span class="sc2">1</span><span class="sc10">,-</span><span class="sc2">1</span><span class="sc10">),(</span><span class="sc2">0</span><span class="sc10">,-</span><span class="sc2">1</span><span class="sc10">),(-</span><span class="sc2">1</span><span class="sc10">,-</span><span class="sc2">1</span><span class="sc10">),(-</span><span class="sc2">1</span><span class="sc10">,</span><span class="sc2">0</span><span class="sc10">),(-</span><span class="sc2">1</span><span class="sc10">,+</span><span class="sc2">1</span><span class="sc10">)]:</span><span class="sc0">
+            </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">IsOnBoard</span><span class="sc10">(</span><span class="sc11">x</span><span class="sc10">+</span><span class="sc11">dx</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">+</span><span class="sc11">dy</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">x</span><span class="sc10">+</span><span class="sc11">dx</span><span class="sc10">][</span><span class="sc11">y</span><span class="sc10">+</span><span class="sc11">dy</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc10">:</span><span class="sc0">
+                </span><span class="sc11">es</span><span class="sc10">.</span><span class="sc11">append</span><span class="sc10">((</span><span class="sc11">dx</span><span class="sc10">,</span><span class="sc11">dy</span><span class="sc10">))</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">es</span><span class="sc0">
+    
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">ExistsSandwichedCounter</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Does there exist at least one counter which would be flipped if my counter was placed at (x,y)?
+        """</span><span class="sc0">
+        </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">dx</span><span class="sc10">,</span><span class="sc11">dy</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">AdjacentEnemyDirections</span><span class="sc10">(</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">):</span><span class="sc0">
+            </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">len</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">SandwichedCounters</span><span class="sc10">(</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">,</span><span class="sc11">dx</span><span class="sc10">,</span><span class="sc11">dy</span><span class="sc10">))</span><span class="sc0"> </span><span class="sc10">&gt;</span><span class="sc0"> </span><span class="sc2">0</span><span class="sc10">:</span><span class="sc0">
+                </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc5">True</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc5">False</span><span class="sc0">
+    
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">GetAllSandwichedCounters</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">x</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">y</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Is (x,y) a possible move (i.e. opponent counters are sandwiched between (x,y) and my counter in some direction)?
+        """</span><span class="sc0">
+        </span><span class="sc11">sandwiched</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc10">[]</span><span class="sc0">
+        </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">dx</span><span class="sc10">,</span><span class="sc11">dy</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">AdjacentEnemyDirections</span><span class="sc10">(</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">):</span><span class="sc0">
+            </span><span class="sc11">sandwiched</span><span class="sc10">.</span><span class="sc11">extend</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">SandwichedCounters</span><span class="sc10">(</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">,</span><span class="sc11">dx</span><span class="sc10">,</span><span class="sc11">dy</span><span class="sc10">))</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">sandwiched</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">SandwichedCounters</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">x</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">y</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">dx</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">dy</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Return the coordinates of all opponent counters sandwiched between (x,y) and my counter.
+        """</span><span class="sc0">
+        </span><span class="sc11">x</span><span class="sc0"> </span><span class="sc10">+=</span><span class="sc0"> </span><span class="sc11">dx</span><span class="sc0">
+        </span><span class="sc11">y</span><span class="sc0"> </span><span class="sc10">+=</span><span class="sc0"> </span><span class="sc11">dy</span><span class="sc0">
+        </span><span class="sc11">sandwiched</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc10">[]</span><span class="sc0">
+        </span><span class="sc5">while</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">IsOnBoard</span><span class="sc10">(</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">x</span><span class="sc10">][</span><span class="sc11">y</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc10">:</span><span class="sc0">
+            </span><span class="sc11">sandwiched</span><span class="sc10">.</span><span class="sc11">append</span><span class="sc10">((</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">))</span><span class="sc0">
+            </span><span class="sc11">x</span><span class="sc0"> </span><span class="sc10">+=</span><span class="sc0"> </span><span class="sc11">dx</span><span class="sc0">
+            </span><span class="sc11">y</span><span class="sc0"> </span><span class="sc10">+=</span><span class="sc0"> </span><span class="sc11">dy</span><span class="sc0">
+        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">IsOnBoard</span><span class="sc10">(</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">x</span><span class="sc10">][</span><span class="sc11">y</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc2">3</span><span class="sc0"> </span><span class="sc10">-</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc10">:</span><span class="sc0">
+            </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">sandwiched</span><span class="sc0">
+        </span><span class="sc5">else</span><span class="sc10">:</span><span class="sc0">
+            </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc10">[]</span><span class="sc0"> </span><span class="sc1"># nothing sandwiched</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">IsOnBoard</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">x</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">y</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">x</span><span class="sc0"> </span><span class="sc10">&gt;=</span><span class="sc0"> </span><span class="sc2">0</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">x</span><span class="sc0"> </span><span class="sc10">&lt;</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">size</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">y</span><span class="sc0"> </span><span class="sc10">&gt;=</span><span class="sc0"> </span><span class="sc2">0</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">y</span><span class="sc0"> </span><span class="sc10">&lt;</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">size</span><span class="sc0">
+    
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">GetResult</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">playerjm</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Get the game result from the viewpoint of playerjm. 
+        """</span><span class="sc0">
+        </span><span class="sc11">jmcount</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">len</span><span class="sc10">([(</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">x</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">range</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">size</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">y</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">range</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">size</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">x</span><span class="sc10">][</span><span class="sc11">y</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc11">playerjm</span><span class="sc10">])</span><span class="sc0">
+        </span><span class="sc11">notjmcount</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">len</span><span class="sc10">([(</span><span class="sc11">x</span><span class="sc10">,</span><span class="sc11">y</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">x</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">range</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">size</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">y</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">range</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">size</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">x</span><span class="sc10">][</span><span class="sc11">y</span><span class="sc10">]</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc2">3</span><span class="sc0"> </span><span class="sc10">-</span><span class="sc0"> </span><span class="sc11">playerjm</span><span class="sc10">])</span><span class="sc0">
+        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">jmcount</span><span class="sc0"> </span><span class="sc10">&gt;</span><span class="sc0"> </span><span class="sc11">notjmcount</span><span class="sc10">:</span><span class="sc0"> </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc2">1.0</span><span class="sc0">
+        </span><span class="sc5">elif</span><span class="sc0"> </span><span class="sc11">notjmcount</span><span class="sc0"> </span><span class="sc10">&gt;</span><span class="sc0"> </span><span class="sc11">jmcount</span><span class="sc10">:</span><span class="sc0"> </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc2">0.0</span><span class="sc0">
+        </span><span class="sc5">else</span><span class="sc10">:</span><span class="sc0"> </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc2">0.5</span><span class="sc0"> </span><span class="sc1"># draw</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">__repr__</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc11">s</span><span class="sc10">=</span><span class="sc0"> </span><span class="sc3">""</span><span class="sc0">
+        </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">y</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">range</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">size</span><span class="sc10">-</span><span class="sc2">1</span><span class="sc10">,-</span><span class="sc2">1</span><span class="sc10">,-</span><span class="sc2">1</span><span class="sc10">):</span><span class="sc0">
+            </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">x</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">range</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">size</span><span class="sc10">):</span><span class="sc0">
+                </span><span class="sc11">s</span><span class="sc0"> </span><span class="sc10">+=</span><span class="sc0"> </span><span class="sc3">".XO"</span><span class="sc10">[</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">board</span><span class="sc10">[</span><span class="sc11">x</span><span class="sc10">][</span><span class="sc11">y</span><span class="sc10">]]</span><span class="sc0">
+            </span><span class="sc11">s</span><span class="sc0"> </span><span class="sc10">+=</span><span class="sc0"> </span><span class="sc3">"\n"</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">s</span><span class="sc0">
+
+</span><span class="sc5">class</span><span class="sc0"> </span><span class="sc8">Node</span><span class="sc10">:</span><span class="sc0">
+    </span><span class="sc7">""" A node in the game tree. Note wins is always from the viewpoint of playerJustMoved.
+        Crashes if state not specified.
+    """</span><span class="sc0">
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">__init__</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">move</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc5">None</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">parent</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc5">None</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">state</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc5">None</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">move</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">move</span><span class="sc0"> </span><span class="sc1"># the move that got us to this node - "None" for the root node</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">parentNode</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">parent</span><span class="sc0"> </span><span class="sc1"># "None" for the root node</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">childNodes</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc10">[]</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">wins</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc2">0</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">visits</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc2">0</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">untriedMoves</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">GetMoves</span><span class="sc10">()</span><span class="sc0"> </span><span class="sc1"># future child nodes</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc1"># the only part of the state that the Node needs later</span><span class="sc0">
+        
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">UCTSelectChild</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Use the UCB1 formula to select a child node. Often a constant UCTK is applied so we have
+            lambda c: c.wins/c.visits + UCTK * sqrt(2*log(self.visits)/c.visits to vary the amount of
+            exploration versus exploitation.
+        """</span><span class="sc0">
+        </span><span class="sc11">s</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">sorted</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">childNodes</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">key</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc5">lambda</span><span class="sc0"> </span><span class="sc11">c</span><span class="sc10">:</span><span class="sc0"> </span><span class="sc11">c</span><span class="sc10">.</span><span class="sc11">wins</span><span class="sc10">/</span><span class="sc11">c</span><span class="sc10">.</span><span class="sc11">visits</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc11">sqrt</span><span class="sc10">(</span><span class="sc2">2</span><span class="sc10">*</span><span class="sc11">log</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">visits</span><span class="sc10">)/</span><span class="sc11">c</span><span class="sc10">.</span><span class="sc11">visits</span><span class="sc10">))[-</span><span class="sc2">1</span><span class="sc10">]</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">s</span><span class="sc0">
+    
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">AddChild</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">m</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">s</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Remove m from untriedMoves and add a new child node for this move.
+            Return the added child node
+        """</span><span class="sc0">
+        </span><span class="sc11">n</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">Node</span><span class="sc10">(</span><span class="sc11">move</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">m</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">parent</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">state</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">s</span><span class="sc10">)</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">untriedMoves</span><span class="sc10">.</span><span class="sc11">remove</span><span class="sc10">(</span><span class="sc11">m</span><span class="sc10">)</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">childNodes</span><span class="sc10">.</span><span class="sc11">append</span><span class="sc10">(</span><span class="sc11">n</span><span class="sc10">)</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">n</span><span class="sc0">
+    
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">Update</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">result</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc7">""" Update this node - one additional visit and result additional wins. result must be from the viewpoint of playerJustmoved.
+        """</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">visits</span><span class="sc0"> </span><span class="sc10">+=</span><span class="sc0"> </span><span class="sc2">1</span><span class="sc0">
+        </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">wins</span><span class="sc0"> </span><span class="sc10">+=</span><span class="sc0"> </span><span class="sc11">result</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">__repr__</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc3">"[M:"</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc11">str</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">move</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc3">" W/V:"</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc11">str</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">wins</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc3">"/"</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc11">str</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">visits</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc3">" U:"</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc11">str</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">untriedMoves</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc3">"]"</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">TreeToString</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">indent</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc11">s</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">IndentString</span><span class="sc10">(</span><span class="sc11">indent</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc11">str</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">)</span><span class="sc0">
+        </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">c</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">childNodes</span><span class="sc10">:</span><span class="sc0">
+             </span><span class="sc11">s</span><span class="sc0"> </span><span class="sc10">+=</span><span class="sc0"> </span><span class="sc11">c</span><span class="sc10">.</span><span class="sc11">TreeToString</span><span class="sc10">(</span><span class="sc11">indent</span><span class="sc10">+</span><span class="sc2">1</span><span class="sc10">)</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">s</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">IndentString</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">,</span><span class="sc11">indent</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc11">s</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc3">"\n"</span><span class="sc0">
+        </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">i</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">range</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc2">1</span><span class="sc10">,</span><span class="sc11">indent</span><span class="sc10">+</span><span class="sc2">1</span><span class="sc10">):</span><span class="sc0">
+            </span><span class="sc11">s</span><span class="sc0"> </span><span class="sc10">+=</span><span class="sc0"> </span><span class="sc3">"| "</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">s</span><span class="sc0">
+
+    </span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">ChildrenToString</span><span class="sc10">(</span><span class="sc11">self</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc11">s</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc3">""</span><span class="sc0">
+        </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">c</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">self</span><span class="sc10">.</span><span class="sc11">childNodes</span><span class="sc10">:</span><span class="sc0">
+             </span><span class="sc11">s</span><span class="sc0"> </span><span class="sc10">+=</span><span class="sc0"> </span><span class="sc11">str</span><span class="sc10">(</span><span class="sc11">c</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc3">"\n"</span><span class="sc0">
+        </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">s</span><span class="sc0">
+
+
+</span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">UCT</span><span class="sc10">(</span><span class="sc11">rootstate</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">itermax</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">verbose</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc5">False</span><span class="sc10">):</span><span class="sc0">
+    </span><span class="sc7">""" Conduct a UCT search for itermax iterations starting from rootstate.
+        Return the best move from the rootstate.
+        Assumes 2 alternating players (player 1 starts), with game results in the range [0.0, 1.0]."""</span><span class="sc0">
+
+    </span><span class="sc11">rootnode</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">Node</span><span class="sc10">(</span><span class="sc11">state</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">rootstate</span><span class="sc10">)</span><span class="sc0">
+
+    </span><span class="sc5">for</span><span class="sc0"> </span><span class="sc11">i</span><span class="sc0"> </span><span class="sc5">in</span><span class="sc0"> </span><span class="sc11">range</span><span class="sc10">(</span><span class="sc11">itermax</span><span class="sc10">):</span><span class="sc0">
+        </span><span class="sc11">node</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">rootnode</span><span class="sc0">
+        </span><span class="sc11">state</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">rootstate</span><span class="sc10">.</span><span class="sc11">Clone</span><span class="sc10">()</span><span class="sc0">
+
+        </span><span class="sc1"># Select</span><span class="sc0">
+        </span><span class="sc5">while</span><span class="sc0"> </span><span class="sc11">node</span><span class="sc10">.</span><span class="sc11">untriedMoves</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc10">[]</span><span class="sc0"> </span><span class="sc5">and</span><span class="sc0"> </span><span class="sc11">node</span><span class="sc10">.</span><span class="sc11">childNodes</span><span class="sc0"> </span><span class="sc10">!=</span><span class="sc0"> </span><span class="sc10">[]:</span><span class="sc0"> </span><span class="sc1"># node is fully expanded and non-terminal</span><span class="sc0">
+            </span><span class="sc11">node</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">node</span><span class="sc10">.</span><span class="sc11">UCTSelectChild</span><span class="sc10">()</span><span class="sc0">
+            </span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">DoMove</span><span class="sc10">(</span><span class="sc11">node</span><span class="sc10">.</span><span class="sc11">move</span><span class="sc10">)</span><span class="sc0">
+
+        </span><span class="sc1"># Expand</span><span class="sc0">
+        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">node</span><span class="sc10">.</span><span class="sc11">untriedMoves</span><span class="sc0"> </span><span class="sc10">!=</span><span class="sc0"> </span><span class="sc10">[]:</span><span class="sc0"> </span><span class="sc1"># if we can expand (i.e. state/node is non-terminal)</span><span class="sc0">
+            </span><span class="sc11">m</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">random</span><span class="sc10">.</span><span class="sc11">choice</span><span class="sc10">(</span><span class="sc11">node</span><span class="sc10">.</span><span class="sc11">untriedMoves</span><span class="sc10">)</span><span class="sc0"> 
+            </span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">DoMove</span><span class="sc10">(</span><span class="sc11">m</span><span class="sc10">)</span><span class="sc0">
+            </span><span class="sc11">node</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">node</span><span class="sc10">.</span><span class="sc11">AddChild</span><span class="sc10">(</span><span class="sc11">m</span><span class="sc10">,</span><span class="sc11">state</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc1"># add child and descend tree</span><span class="sc0">
+
+        </span><span class="sc1"># Rollout - this can often be made orders of magnitude quicker using a state.GetRandomMove() function</span><span class="sc0">
+        </span><span class="sc5">while</span><span class="sc0"> </span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">GetMoves</span><span class="sc10">()</span><span class="sc0"> </span><span class="sc10">!=</span><span class="sc0"> </span><span class="sc10">[]:</span><span class="sc0"> </span><span class="sc1"># while state is non-terminal</span><span class="sc0">
+            </span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">DoMove</span><span class="sc10">(</span><span class="sc11">random</span><span class="sc10">.</span><span class="sc11">choice</span><span class="sc10">(</span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">GetMoves</span><span class="sc10">()))</span><span class="sc0">
+
+        </span><span class="sc1"># Backpropagate</span><span class="sc0">
+        </span><span class="sc5">while</span><span class="sc0"> </span><span class="sc11">node</span><span class="sc0"> </span><span class="sc10">!=</span><span class="sc0"> </span><span class="sc5">None</span><span class="sc10">:</span><span class="sc0"> </span><span class="sc1"># backpropagate from the expanded node and work back to the root node</span><span class="sc0">
+            </span><span class="sc11">node</span><span class="sc10">.</span><span class="sc11">Update</span><span class="sc10">(</span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">GetResult</span><span class="sc10">(</span><span class="sc11">node</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc10">))</span><span class="sc0"> </span><span class="sc1"># state is terminal. Update node with result from POV of node.playerJustMoved</span><span class="sc0">
+            </span><span class="sc11">node</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">node</span><span class="sc10">.</span><span class="sc11">parentNode</span><span class="sc0">
+
+    </span><span class="sc1"># Output some information about the tree - can be omitted</span><span class="sc0">
+    </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">verbose</span><span class="sc10">):</span><span class="sc0"> </span><span class="sc5">print</span><span class="sc0"> </span><span class="sc11">rootnode</span><span class="sc10">.</span><span class="sc11">TreeToString</span><span class="sc10">(</span><span class="sc2">0</span><span class="sc10">)</span><span class="sc0">
+    </span><span class="sc5">else</span><span class="sc10">:</span><span class="sc0"> </span><span class="sc5">print</span><span class="sc0"> </span><span class="sc11">rootnode</span><span class="sc10">.</span><span class="sc11">ChildrenToString</span><span class="sc10">()</span><span class="sc0">
+
+    </span><span class="sc5">return</span><span class="sc0"> </span><span class="sc11">sorted</span><span class="sc10">(</span><span class="sc11">rootnode</span><span class="sc10">.</span><span class="sc11">childNodes</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">key</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc5">lambda</span><span class="sc0"> </span><span class="sc11">c</span><span class="sc10">:</span><span class="sc0"> </span><span class="sc11">c</span><span class="sc10">.</span><span class="sc11">visits</span><span class="sc10">)[-</span><span class="sc2">1</span><span class="sc10">].</span><span class="sc11">move</span><span class="sc0"> </span><span class="sc1"># return the move that was most visited</span><span class="sc0">
+                
+</span><span class="sc5">def</span><span class="sc0"> </span><span class="sc9">UCTPlayGame</span><span class="sc10">():</span><span class="sc0">
+    </span><span class="sc7">""" Play a sample game between two UCT players where each player gets a different number 
+        of UCT iterations (= simulations = tree nodes).
+    """</span><span class="sc0">
+    </span><span class="sc1"># state = OthelloState(4) # uncomment to play Othello on a square board of the given size</span><span class="sc0">
+    </span><span class="sc1"># state = OXOState() # uncomment to play OXO</span><span class="sc0">
+    </span><span class="sc11">state</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">NimState</span><span class="sc10">(</span><span class="sc2">15</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc1"># uncomment to play Nim with the given number of starting chips</span><span class="sc0">
+    </span><span class="sc5">while</span><span class="sc0"> </span><span class="sc10">(</span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">GetMoves</span><span class="sc10">()</span><span class="sc0"> </span><span class="sc10">!=</span><span class="sc0"> </span><span class="sc10">[]):</span><span class="sc0">
+        </span><span class="sc5">print</span><span class="sc0"> </span><span class="sc11">str</span><span class="sc10">(</span><span class="sc11">state</span><span class="sc10">)</span><span class="sc0">
+        </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc2">1</span><span class="sc10">:</span><span class="sc0">
+            </span><span class="sc11">m</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">UCT</span><span class="sc10">(</span><span class="sc11">rootstate</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">state</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">itermax</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc2">1000</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">verbose</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc5">False</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc1"># play with values for itermax and verbose = True</span><span class="sc0">
+        </span><span class="sc5">else</span><span class="sc10">:</span><span class="sc0">
+            </span><span class="sc11">m</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">UCT</span><span class="sc10">(</span><span class="sc11">rootstate</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc11">state</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">itermax</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc2">100</span><span class="sc10">,</span><span class="sc0"> </span><span class="sc11">verbose</span><span class="sc0"> </span><span class="sc10">=</span><span class="sc0"> </span><span class="sc5">False</span><span class="sc10">)</span><span class="sc0">
+        </span><span class="sc5">print</span><span class="sc0"> </span><span class="sc3">"Best Move: "</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc11">str</span><span class="sc10">(</span><span class="sc11">m</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc3">"\n"</span><span class="sc0">
+        </span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">DoMove</span><span class="sc10">(</span><span class="sc11">m</span><span class="sc10">)</span><span class="sc0">
+    </span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">GetResult</span><span class="sc10">(</span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc2">1.0</span><span class="sc10">:</span><span class="sc0">
+        </span><span class="sc5">print</span><span class="sc0"> </span><span class="sc3">"Player "</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc11">str</span><span class="sc10">(</span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc3">" wins!"</span><span class="sc0">
+    </span><span class="sc5">elif</span><span class="sc0"> </span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">GetResult</span><span class="sc10">(</span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc2">0.0</span><span class="sc10">:</span><span class="sc0">
+        </span><span class="sc5">print</span><span class="sc0"> </span><span class="sc3">"Player "</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc11">str</span><span class="sc10">(</span><span class="sc2">3</span><span class="sc0"> </span><span class="sc10">-</span><span class="sc0"> </span><span class="sc11">state</span><span class="sc10">.</span><span class="sc11">playerJustMoved</span><span class="sc10">)</span><span class="sc0"> </span><span class="sc10">+</span><span class="sc0"> </span><span class="sc3">" wins!"</span><span class="sc0">
+    </span><span class="sc5">else</span><span class="sc10">:</span><span class="sc0"> </span><span class="sc5">print</span><span class="sc0"> </span><span class="sc3">"Nobody wins!"</span><span class="sc0">
+
+</span><span class="sc5">if</span><span class="sc0"> </span><span class="sc11">__name__</span><span class="sc0"> </span><span class="sc10">==</span><span class="sc0"> </span><span class="sc3">"__main__"</span><span class="sc10">:</span><span class="sc0">
+    </span><span class="sc7">""" Play a single game to the end using UCT for both players. 
+    """</span><span class="sc0">
+    </span><span class="sc11">UCTPlayGame</span><span class="sc10">()</span><span class="sc0">
+
+            
+                          
+            
+
+</span></div>
+          </td>
+        </tr>
+      </table>
+      <p><span class="style7">The complete Python code for this example can be downloaded <a href="UCT.py">here</a>.<br />
+      </span><br />
+      </p>
+      <hr noshade="noshade" />
+      <p class="style12">&nbsp;</p>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

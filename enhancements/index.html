@@ -1,0 +1,249 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Monte Carlo Tree Search - Enhancements</title>
+<style type="text/css">
+<!--
+.style3 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	color: #666666;
+}
+.style6 {
+	font-size: 44px;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #666666;
+}
+.style7 {
+	font-family: Arial, Helvetica, sans-serif;
+	color: #333333;
+}
+a:link {
+	color: #CC6600;
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+	color: #993333;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+.style12 {font-family: Arial, Helvetica, sans-serif; color: #666666; font-size: xx-large;}
+.style13 {
+	font-size: large;
+	font-weight: bold;
+}
+-->
+</style>
+</head>
+
+<body>
+<table width="95%" border="0" cellpadding="16" cellspacing="0">
+  <tr>
+    <td width="149"><div align="center"><img src="../logo/mcts-logo-36a.png" width="150" height="36" /></div></td>
+    <td class="style6">Enhancements</td>
+  </tr>
+  <tr>
+    <td valign="top"><p align="center" class="style3">      <a href="../index.html">Home</a></p>
+      <p align="center" class="style3"><a href="../about/index.html">About</a></p>
+    <p align="center" class="style3"><a href="../tutorial/index.html">Tutorial</a></p>
+    <p align="center" class="style3"><a href="../code/index.html">Code</a></p>
+    <p align="center"><span class="style3"><a href="../applications/index.html">Applications</a></span></p>
+    <p align="center"><span class="style3"><a href="../enhancements/index.html">Enhancements</a></span></p>
+    <p align="center" class="style3"><a href="../bibliography/index.html">Bibliography</a></p>
+    <p align="center" class="style3"><a href="../resources/index.html">Resources</a></p>
+    <p align="center" class="style3"><a href="../project/index.html">Project</a><br />
+    </p></td>
+    <td valign="top" bordercolor="#FF6600" bgcolor="#FFF5D7"><p class="style7">      Most MCTS research is devoted to improving the efficiency and resulting playing strength of the algorithm through various enhancements. We list some of the key enhancements below.<br />
+    </p>
+      <hr noshade="noshade" />
+      <p class="style12">Bandit Based Methods</p>
+      <p class="style7">Bandit based methods lie at the heart of  MCTS node selection. Most implementations use an Upper Confidence Bounds (UCB) approach or one of its derivatives.</p>
+      <p class="style7"><span class="style13">UCB1</span><br />
+        TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">UCB1-Tuned</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">UCB-V</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">PAC-UCB</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Gaussian UCB</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Exp3</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Meta-Bandits</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Hierarchical  Bandits</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.<br />
+        <br />
+</p>
+      <hr noshade="noshade" />
+      <p class="style12">All Moves As First (AMAF)</p>
+      <p class="style7">All Moves As First (AMAF) is a method commonly used in earlier Monte Carlo Go programmes to accelerate node reward estimate reliability. The basic principle is to update the reward value and visit count for not only the current move but for all further moves (by the same player) further down current playout sequence, the rationale being that the final result of most  move sequences will be the same regardless of the order in which those moves were made.</p>
+      <p class="style7">AMAF is a fundamental domain-independent  enhancement   that can yield  significant performance benefits. It is usually one of the first enhancements to try  for any MCTS application.</p>
+      <p class="style7"><span class="style13">Basic AMAF</span><br />
+The basic AMAF method  adds the AMAF update values directly to existing UCT  values, and these combined values are  used for UCB node selection as usual. This is the simplest AMAF approach but can actually prove detrimental, as UCT reward values are combined with less reliable AMAF reward values even after nodes have been visited a sufficient number of times for the UCT estimates to be reliable.</p>
+      <p class="style7"><em>See</em>: Helmbold and Parker-Wood (2006).</p>
+      <p class="style7"><span class="style13">Permutation-AMAF</span><br />
+        TDB...</p>
+      <p class="style7"><em>See</em>: Helmbold and Parker-Wood (2006).</p>
+      <p class="style7"><span class="style13">α-AMAF</span><br />
+        Separate sets of values are kept for UCT and AMAG estimates. Exploitation values  are linearly blended between the AMAF and UCT reward values during UCB node selection.</p>
+      <p class="style7"><em>See</em>: Helmbold and Parker-Wood (2006).</p>
+      <p class="style7"><span class="style13">Some-First AMAF</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: Helmbold and Parker-Wood (2006).</p>
+      <p class="style7"><span class="style13">Cutoff AMAF</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: Helmbold and Parker-Wood (2006).</p>
+      <p class="style7"><span class="style13">RAVE</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: Helmbold and Parker-Wood (2006).<br />
+        <br />
+      </p>
+      <hr noshade="noshade" />
+      <p class="style12"> Node Initialisation</p>
+      <p class="style7">TDB</p>
+      <p class="style7"><span class="style13">History Heuristic</span><br />
+      TDB</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Transpositions</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Reinforcement Learning</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">TDα</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <br />
+      <hr noshade="noshade" />
+      <p class="style12">Node Selection</p>
+      <p class="style7">TDB</p>
+      <p class="style7"><span class="style13">First Play Urgency</span><br />
+        TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Move Pruning</span><br />
+        TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Contextual MCTS</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Nested MCTS</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Regret Minimisation</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Exploration Ordering</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Move Groups</span><br />
+        TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Multiobjective Methods</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Sample Based Planning</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Criticality</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">FAST</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">MAST</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">PAST</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Exp3</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <br />
+      <hr noshade="noshade" />
+      <p class="style12">Domain Specific</p>
+      <p class="style7">Playing strength can be improved by exploiting knowledge specific to the target  domain (i.e game). This can lead to dramatic improvements in performance at the expense of generality.</p>
+      <p class="style7"><span class="style13">Playout Heuristics</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Domain Characteristics</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.<br />
+        <br />
+      </p>
+      <hr noshade="noshade" />
+      <p class="style12">Domain Independent</p>
+      <p class="style7">TDB</p>
+      <p class="style7"><span class="style13">Parameter Tuning</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Forced Moves</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Single Player MCTS (SP-MCTS)</span><br />
+        TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Multiplayer MCTS</span><br />
+        TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Realtime MCTS</span><br />
+      TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Handling Uncertainty</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">TAG</span><br />
+      TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">RRTs</span><br />
+        TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">MHSP</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">UCT+</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Cross-Entropy MCTS</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Optimal Active Learning</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Evolutionary Methods</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <br />
+      <hr noshade="noshade" />
+      <p class="style12">Parallelisation</p>
+      <p class="style7">TDB</p>
+      <p class="style7"><span class="style13">Root Parallelisation</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">Leaf Parallelisation</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+      <p class="style7"><span class="style13">GPU Implementation</span><br />
+TDB...</p>
+      <p class="style7"><em>See</em>: ?.</p>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

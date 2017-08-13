@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monte Carlo Tree Search - Project publications</title>
+	<link rel="stylesheet" type="text/css" href="style.css"/>
+	<script src="jquery-1.11.0.min.js"></script>
+	<script src="jquery.sortChildren.js"></script>
+	<script src="parsebib.js"></script>
+	<script src="showbib.js"></script>
+	<script>
+		$(document).ready(function(){
+			showBib(function(e) { return e.hasKeyword("uctfgab"); });
+		});
+	</script>
+</head>
+
+<body>
+<table width="95%" border="0" cellpadding="16" cellspacing="0">
+	<tr>
+		<td width="149"><div align="center"><img src="../logo/mcts-logo-36a.png" width="150" height="36" /></div></td>
+		<td class="style6">Publications</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top">
+			<p align="center" class="menuitem"><a href="../index.html">Home</a></p>
+			<p align="center" class="menuitem"><a href="../about/index.html">About</a></p>
+			<p align="center" class="menuitem"><a href="../code/index.html">Code</a></p>
+			<p align="center" class="menuitem"><a href="../bibliography/index.html">Bibliography</a></p>
+			<p align="center" class="menuitem"><a href="../project/index.html">Project</a></p>
+			<p align="center" class="menuitem"><a href="../bibliography/project.html"><b>Publications</b></a></p>
+		</td>
+		<td valign="top" bordercolor="#FF6600" bgcolor="#FFF5D7">
+			<p class="style7"> This bibliography contains all publications from the "UCT for Games and Beyond" project.</p>
+			<hr noshade="noshade" />
+			<ul class="links" id="toplinks">
+				<li id="toggleIcons"><a onclick="toggleIcons()"><span id="showhidetext">Hide</span> icons</a></li>
+				<li><a onclick="sortByAuthor()">Sort by author</a></li>
+				<li><a onclick="sortByYear()">Sort by year</a></li>
+			</ul>
+			<div class="loading">Loading, please wait...</div>
+			<ol id="bib"></ol>
+		</td>
+	</tr>
+</table>
+</body>
+</html>

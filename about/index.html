@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Monte Carlo Tree Search - About</title>
+<style type="text/css">
+<!--
+.style3 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	color: #666666;
+}
+.style6 {
+	font-size: 44px;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #666666;
+}
+.style7 {
+	font-family: Arial, Helvetica, sans-serif;
+	color: #333333;
+}
+a:link {
+	color: #CC6600;
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+	color: #993333;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+.style8 {
+	font-size: large;
+	font-weight: bold;
+}
+.style12 {font-family: Arial, Helvetica, sans-serif; color: #666666; font-size: xx-large;}
+.style13 {
+	font-family: "Times New Roman", Times, serif;
+	font-style: italic;
+}
+.style15 {font-family: "Times New Roman", Times, serif; font-style: italic; font-size: large; }
+.style16 {font-size: large}
+.style18 {font-size: x-small}
+.style20 {color: #666666; font-family: Arial, Helvetica, sans-serif;}
+.menuitem {color: #666666; font-family: Arial, Helvetica, sans-serif;}
+-->
+</style>
+</head>
+
+<body>
+<table width="95%" border="0" align="left" cellpadding="16" cellspacing="0">
+  <tr>
+    <td width="150" align="left"><div align="center"><img src="../logo/mcts-logo-36a.png" width="150" height="36" /></div></td>
+    <td align="left" class="style6">About</td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+      <p align="center" class="menuitem"><a href="../index.html">Home</a></p>
+      <p align="center" class="menuitem"><a href="../about/index.html"><b>About</b></a></p>
+      <p align="center" class="menuitem"><a href="../code/index.html">Code</a></p>
+      <p align="center" class="menuitem"><a href="../bibliography/index.html">Bibliography</a></p>
+      <p align="center" class="menuitem"><a href="../project/index.html">Project</a></p>
+	  <p align="center" class="menuitem"><a href="../bibliography/project.html">Publications</a></p>
+    </td>
+    <td align="left" valign="top" bordercolor="#FF6600" bgcolor="#FFF5D7"><p class="style7"><span class="style12">What is MCTS?</span></p>
+      <p class="style7">Monte Carlo Tree Search (MCTS) is a method for making optimal decisions in artificial intelligence (AI) problems, typically move planning in combinatorial games. It combines the generality of random simulation with the precision of tree search.</p>
+      <p class="style7">Research interest in MCTS has risen sharply   due to its spectacular success with computer Go and  potential application to a number of other difficult problems. Its application extends beyond games, and MCTS can theoretically be applied to any domain that can be described in terms of {<em>state</em>, <em>action</em>} pairs and  simulation used to forecast outcomes.<br />  
+        <br />
+      </p>
+      <hr noshade="noshade" />
+      <p class="style12">Basic Algorithm</p>
+      <p class="style7"> The basic MCTS algorithm is simple: a search tree is built, node by node, according to the outcomes of simulated playouts. The process can be broken down into the following steps.</p>
+      <p class="style7"><img src="mcts-algorithm-1a.png" width="571" height="233" /></p>
+      <p class="style7"><span class="style8">1. Selection<br />
+      </span> Starting at root node <em>R</em>, recursively select optimal child nodes  (explained below) until a leaf node <em>L</em> is reached.</p>
+      <p class="style7"><span class="style8">2. Expansion<br />
+      </span> If <em>L</em> is a not a terminal node (i.e. it does not end the game) then create one or more  child nodes and select one <em>C</em>.</p>
+      <p class="style7"><span class="style8">3. Simulation<br />
+      </span> Run a simulated playout from <em>C</em> until a result is achieved.</p>
+      <p class="style7"><span class="style8">4. Backpropagation<br />
+      </span> Update the current move sequence with the simulation result.</p>
+      <p class="style7">See the <a href="../tutorial/index.html">Tutorial </a>page for an example of this process in action.</p>
+      <p class="style7">Each node must contain two important pieces of information: an estimated value based on simulation results and the number of times it  has been visited.</p>
+      <p class="style7">In its simplest and most memory efficient implementation, MCTS will add one child node per iteration. Note, however, that it may be beneficial to add more than one child node per iteration depending on the application. <br />
+        <br />
+      </p>
+      <hr noshade="noshade" />
+      <p class="style12">Node Selection</p>
+      <p class="style7"> <span class="style8">Bandits and UCB</span><br />
+      Node selection during   tree descent is  achieved by choosing the node that maximises some quantity,  analogous  to the <em>multiarmed bandit problem</em> in which a player must choose the slot machine (bandit) that maximises the estimated reward each turn. An  Upper Confidence Bounds (UCB) formula of the following form is typically used:</p>
+      <p class="style7">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="ucb-1.png" width="200" height="72" /></p>
+      <p class="style7">where <span class="style13"><span class="style16">v</span><span class="style18">i</span></span> is the estimated value of the node, <span class="style15">n<span class="style18">i</span></span> is the number of the times the node has been visited and <span class="style15">N</span> is the total number of times that its parent has been visited. <span class="style15">C</span> is a tunable bias parameter. </p>
+      <p class="style7"><span class="style8">Exploitation vs Exploration</span><br />
+      The UCB  formula  balances  the <em>exploitation</em> of known rewards with the <em>exploration</em> of relatively unvisited nodes to encourage their exercise. Reward estimates are based on random simulations, so nodes must be visited a number of times before these estimates become reliable; MCTS estimates will typically be unreliable at the start of a search but converge to more reliable estimates given sufficient time and perfect estimates given infinite time.</p>
+      <p class="style7"><span class="style8">MCTS and UCT</span><br />
+      Kocsis and Szepervari (2006) first formalised a complete MCTS algorithm by extending UCB to minimax tree search and named  it the Upper Confidence Bounds for Trees (UCT) method. This is the algorithm used in the vast majority of current MCTS implementations. </p>
+      <p class="style7">UCT may  be described   as a special case of MCTS, that is: UCT = MCTS + UCB.<br />  
+        <br />
+      </p>
+      <hr noshade="noshade" />
+    <p class="style12">Benefits</p>
+    <p class="style7">MCTS offers a number of advantages over traditional tree search methods.</p>
+    <p class="style7"><span class="style8">Aheuristic</span><br />
+      MCTS  does not require any strategic or tactical knowledge about the given domain  to make reasonable  decisions. The algorithm can function effectively with no knowledge of a game apart from its legal moves and end conditions; this means that a single MCTS implementation can be reused for a number of games with little modification, and makes MCTS a potential boon for general game playing. </p>
+    <p class="style7"><span class="style8">Asymmetric</span><br />
+MCTS performs  asymmetric tree growth that adapts to the topology of the search space. The algorithm visits more interesting nodes more often, and focusses its search time in more relevant parts of the tree.</p>
+    <p class="style7"><img src="../mcts-tree-4.png" width="500" height="276" /></p>
+    <p class="style7">This makes MCTS suitable for games with large branching factors such as 19x19 Go. Such  large combinatorial spaces  typically cause problems for standard depth- or breadth-based search methods, but the adaptive nature of MCTS means that it will (eventually) find those moves that appear optimal and focus its search effort  there.<br />
+        </p>
+    <p class="style7"><span class="style8">Anytime</span><br />
+The algorithm can be halted at any time to return the current best estimate. The search tree built thus far may be discarded or preserved for future reuse.<br />
+</p>
+    <p class="style7"><span class="style8">Elegant</span><br />
+The algorithm is  simple to implement (see the <a href="../code/index.html">Code</a>).<br />
+<br />
+    </p>
+    <hr noshade="noshade" />
+    <p class="style12">Drawbacks</p>
+    <p class="style7">MCTS  has few drawbacks, but they can be major.</p>
+    <p class="style7"><span class="style8">Playing Strength</span><br />
+The MCTS algorithm, in its basic form, can fail to find  reasonable moves for even games of medium complexity within a reasonable amount of time. This is mostly due to the sheer size of the combinatorial move space and the fact that key nodes may not be visited enough times to give reliable estimates.</p>
+    <p class="style7"><span class="style8">Speed</span><br />
+MCTS search can take many iterations to converge to a good solution, which can be an issue for more general applications that are difficult to optimise. For example, the best Go implementations can require millions of playouts in conjunction with domain specific optimisations and enhancements to make expert moves, whereas the best GGP implementations may only make tens of  (domain independent) playouts per second for more complex games. For reasonable move times,  such GGPs may barely have time to visit each legal move and it is unlikely that significant search will occur.</p>
+    <p class="style7">Luckily, the performance of the algorithm can be sigificantly improved using a number of techniques.<br />
+      <br />
+    </p>
+    <hr noshade="noshade" />
+    <p class="style12">Improvements</p>
+    <p class="style7">Dozens of  MCTS enhancements have been suggested to date. These can generally be  described as  being either domain knowledge or domain independent.</p>
+    <p class="style7"><span class="style8">Domain Knowledge</span><br />
+      Domain knowledge specific to the current game can be  exploited in the tree to filter out implausible moves or in the simulations  to produce <em>heavy playouts</em> that are more similar to playouts that would occur between human opponents. This means that playout results will be more realistic  than random simulations and that nodes will require fewer  iterations to yield  realistic reward values.</p>
+    <p class="style7">Domain knowledge can yield significant improvements, at the expense of speed and loss of generality.</p>
+    <p class="style7"><span class="style8">Domain Independent</span><br />
+      Domain independent enhancements    apply to all problem domains.  These are typically applied in the tree (e.g. AMAF) although again some apply to the simulations   (e.g. prefer winning moves during playouts). Domain independent enhancements do not tie the implementation to a particular domain, maintaining generality, and are hence the  focus of most current work in the area. <br />
+      <br />
+    </p>
+    <hr noshade="noshade" />
+    <p class="style12">Context</p>
+    <p class="style7"><strong>1928: </strong>John von Neumann's  minimax theorem paved the way  for adversarial tree search methods that have  formed the basis of decision making in computer science and  AI almost since their inception. </p>
+    <p class="style7"><strong>1940s:</strong> Monte Carlo (MC) methods were formalised as a way to approach  less well-defined problems unsuitable for tree search, through the use of random sampling. </p>
+    <p class="style7"><strong>2006:</strong> Rémi Coulomb  and other researchers combined these two ideas  to provide a new approach to move planning in  computer Go   now known as  MCTS. Kocsis and Szepesvári  formalised this approach into the UCT algorithm.</p>
+    <p class="style7"> It  seems remarkable that this elegant algorithm was  not discovered much sooner!<br />
+        <br />
+    </p>
+    <hr noshade="noshade" />
+    <p class="style12">Research Interest</p>
+    <p class="style7">There have been over 150 research papers written on topics related to  MCTS since its inception a few years ago,  averaging out to over one new publication every fortnight. These include some 50 suggested variations, enhancements and optimisations to the algorithm, which would not be far from the total  number of enhancements suggested for traditional tree search  since its introduction in 1928.</p>
+    <p class="style7">This new field of study is currently a hot research topic in AI, with  many open  research questions still to be addressed and answered.</p>
+    <p class="style7"></p>
+      <hr noshade="noshade" />
+      <p class="style12">MCTS: State of the Art</p>
+      <p class="style7">Imperial College London held the first international MCTS workshop in August 2010 on the theme of <em>MCTS: State of the Art</em>. Speakers included:</p>
+      <p class="style7">O. Teytaud, &quot;State of the Art: What is MCTS, where is it now, and where is it going?” 2010 [Online]. Available: <a href="http://www.aigamesnetwork.org/_media/main:events:london2010.pdf">http://www.aigamesnetwork.org/_media/main:events:london2010.pdf</a></p>
+      <p class="style7"> M. Müller, “Challenges in Monte Carlo Tree Search,” 2010 [Online]. Available: <a href="http://www.aigamesnetwork.org/_media/main:events:london2010-mcts-challenges.pdf">http://www.aigamesnetwork.org/_media/main:events:london2010-mcts-challenges.pdf</a></p>
+      <p class="style7"> R.  Hayward, “MoHex: Computer Hex world champion,” 2010 [Online]. Available: <a href="http://www.aigamesnetwork.org/_media/main:events:mohextalk.pdf">http://www.aigamesnetwork.org/_media/main:events:mohextalk.pdf </a></p>
+      <p class="style7">H. Finnsson and Y.  Björnsson, “CadiaPlayer: MCTS in General Game Playing,” 2010 [Online]. Available: <a href="http://www.aigamesnetwork.org/_media/main:events:cadiaplayer_lic_slides_print.pdf">http://www.aigamesnetwork.org/_media/main:events:cadiaplayer_lic_slides_print.pdf</a></p>
+      <p class="style7"> A.  Rimmel, “Havannah, Monte Carlo Enhancements and Linear Transforms,” 2010 [Online]. Available: <a href="http://www.aigamesnetwork.org/_media/main:events:presmctsworkshop_rimmel.pdf">http://www.aigamesnetwork.org/_media/main:events:presmctsworkshop_rimmel.pdf</a><br />
+  </td></tr>
+</table>
+</body>
+</html>

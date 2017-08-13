@@ -1,0 +1,14 @@
+article.png
+https://www.iconfinder.com/icons/104617/book_learning_icon#size=128
+
+inproceedings.png
+https://www.iconfinder.com/icons/3709/bill_document_report_icon#size=128
+
+phdthesis.png
+https://www.iconfinder.com/icons/174951/cap_graduation_icon#size=128
+
+techreport.png
+https://www.iconfinder.com/icons/3283/preferences_settings_tools_icon#size=128
+
+book.png
+https://www.iconfinder.com/icons/6000/book_dictionary_learn_school_translate_icon#size=128

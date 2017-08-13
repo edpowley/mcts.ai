@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Monte Carlo Tree Search - Project</title>
+<style type="text/css">
+<!--
+.style3 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	color: #666666;
+}
+.style6 {
+	font-size: 44px;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #666666;
+}
+.style7 {
+	font-family: Arial, Helvetica, sans-serif;
+	color: #333333;
+}
+a:link {
+	color: #CC6600;
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+	color: #993333;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+.style12 {font-family: Arial, Helvetica, sans-serif; color: #666666; font-size: xx-large;}
+.style15 {color: #333333}
+.style19 {color: #666666; font-family: Arial, Helvetica, sans-serif;}
+.menuitem {color: #666666; font-family: Arial, Helvetica, sans-serif;}
+-->
+</style>
+</head>
+
+<body>
+<table width="95%" border="0" cellpadding="16" cellspacing="0">
+  <tr>
+    <td width="149"><div align="center"><img src="../logo/mcts-logo-36a.png" width="150" height="36" /></div></td>
+    <td class="style6">Project</td>
+  </tr>
+  <tr>
+    <td align="left" valign="top">
+      <p align="center" class="menuitem"><a href="../index.html">Home</a></p>
+      <p align="center" class="menuitem"><a href="../about/index.html">About</a></p>
+      <p align="center" class="menuitem"><a href="../code/index.html">Code</a></p>
+      <p align="center" class="menuitem"><a href="../bibliography/index.html">Bibliography</a></p>
+      <p align="center" class="menuitem"><a href="../project/index.html"><b>Project</b></a></p>
+      <p align="center" class="menuitem"><a href="../bibliography/project.html">Publications</a></p>
+    </td>
+    <td valign="top" bordercolor="#FF6600" bgcolor="#FFF5D7"><p class="style7"><em>      UCT for Games and Beyond</em> is an  EPSRC-funded project  jointly run by Imperial College London and the Universities of Essex and Bradford. 
+      The aim of this three year project (2010-2013) is to fully explore the MCTS algorithm and investigate its use in novel domains.</p>
+      <p class="style7"><a href="../bibliography/project.html">A list of publications arising from this project is available here.</a></p>
+      <p class="style7">See our <a href="http://www.doc.ic.ac.uk/ccg/doku.php?id=uctgames">project page</a> for more details.</p>
+      <hr noshade="noshade" />
+      <p class="style12">Imperial Team</p>
+      <p class="style7"><a href="http://gow.epsrc.ac.uk/ViewGrant.aspx?GrantRef=EP/I001964/1"><span class="style15">EPSRC Grant</span> EP/I001964/1</a> - £546,000</p>
+      <p class="style7"> The Imperial team investigate the use of MCTS for procedural content generation in creative domains, including the analysis, optimisation and design of new games, music and artwork.</p>
+      <p class="style7"><strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PI</strong>:  &nbsp;<a href="http://www.doc.ic.ac.uk/~sgc/cv.html">Dr Simon Colton</a><br />
+        <strong>&nbsp;&nbsp;&nbsp;&nbsp;RA</strong>: &nbsp;<a href="http://www.cameronius.com/cv/index.htm">Dr Cameron Browne</a><br />
+        <strong>&nbsp;&nbsp;PhD</strong>:&nbsp;&nbsp;<a href="http://www.boardgamegeek.com/boardgamedesigner/11301/stephen-tavener">Stephen Tavener</a></p>
+      <hr noshade="noshade" />
+      <p class="style12">Essex Team</p>
+      <p class="style7"><span class="style7"><a href="http://gow.epsrc.ac.uk/ViewGrant.aspx?GrantRef=EP/I001964/1"><span class="style15">EPSRC Grant</span> </a><a href="http://gow.epsrc.ac.uk/ViewGrant.aspx?GrantRef=EP/H048588/1">EP/H048588/1</a> - £471,000<br />
+        <br />
+The Essex team investigate the application of MCTS in continuous and real-time domains, such as the control of non-player characters in video games and robot movement planning.</span></p>
+      <p class="style7"><span class="style7"><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PI</strong>: &nbsp;<a href="http://dces.essex.ac.uk/staff/lucas/">Prof. Simon Lucas</a><br />
+        <strong>&nbsp;&nbsp;&nbsp;&nbsp;RA</strong>:  &nbsp;<a href="http://www.ssamot.me/">Spyridon Samothrakis</a><br />
+        <strong>&nbsp;&nbsp;PhD</strong>:&nbsp;&nbsp;<a href="http://www.diego-perez.net/">Diego Perez</a></span></p>
+      <hr noshade="noshade" />
+      <p class="style12">York Team</p>
+      <p class="style7"><span class="style7"><a href="http://gow.epsrc.ac.uk/ViewGrant.aspx?GrantRef=EP/I001964/1"><span class="style15">EPSRC Grant</span> </a><a href="http://gow.epsrc.ac.uk/ViewGrant.aspx?GrantRef=EP/H049061/1">EP/H049061/1</a> - £465,000</span></p>
+      <p class="style7"><span class="style7"> The York  team investigate non-deterministic applications of MCTS with particular emphasis on  complex games such as &quot;euro&quot; board games and <em>Magic: The Gathering</em>.</span></p>
+      <p class="style7"><span class="style7"><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PI</strong>:  &nbsp;<a href="http://www.cowling.org.uk/">Prof. Peter Cowling</a><br />
+        <strong>&nbsp;&nbsp;&nbsp;&nbsp;RA</strong>:  &nbsp;<a href="http://www-users.cs.york.ac.uk/~ed/">Dr Edward Powley</a><br />
+        <strong>&nbsp;&nbsp;PhD</strong>:&nbsp;&nbsp;<a href="http://www-users.cs.york.ac.uk/~dwhiteh/">Daniel Whitehouse</a></span></p>
+    <hr noshade="noshade" />
+    <p class="style12">Industry  Partners</p>
+    <p class="style7">Nestor Romeral Andres, <a href="http://www.nestorgames.com/">Nestorgames Ltd</a>, Spain.</p>
+    <p class="style7">Mark Morris, <a href="http://www.introversion.co.uk/">Introversion Software</a>, UK.</p>
+    <p class="style7">Jeff Rollason, <a href="http://www.aifactory.co.uk/">AI Factory</a>, UK.</p>
+    <hr noshade="noshade" />
+    <p class="style12">Project Partners</p>
+    <p class="style7">Yngvi Björnsson and Hilmar Finnsson, <a href="http://cadia.ru.is/">CADIA</a>, Reykjavik University, Iceland.</p>
+    <p class="style7"> <a href="http://www.aigamesnetwork.org/">AI &amp; Games Research Network</a>,  London/Essex/Bradford.</p>
+    </td>
+  </tr>
+</table>
+</body>
+</html>
