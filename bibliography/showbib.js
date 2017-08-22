@@ -187,6 +187,7 @@ function showBib(filter)
 			bibEntries = parseBib(data);
 			
 			var refCount = 0;
+			//var bibtexSrc = "";
 			for (var i=0; i<bibEntries.length; i++)
 			{
 				if (filter(bibEntries[i]))
@@ -194,6 +195,7 @@ function showBib(filter)
 					var entryElement = formatEntry(bibEntries[i]);
 					entryElement.data("entry", bibEntries[i]);
 					$("#bib").append(entryElement);
+					//bibtexSrc += bibEntries[i].bibtex + "\n";
 					refCount++;
 				}
 			}
@@ -202,6 +204,8 @@ function showBib(filter)
 			
 			$("span#refcount").text(refCount);
 			sortByAuthor();
+			
+			//$("pre#bibtexSrc").text(bibtexSrc);
 		}
 	});
 }
