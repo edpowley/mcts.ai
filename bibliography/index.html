@@ -5,11 +5,11 @@
 	<link rel="stylesheet" type="text/css" href="style.css"/>
 	<script src="jquery-1.11.0.min.js"></script>
 	<script src="jquery.sortChildren.js"></script>
-	<script src="parsebib.js"></script>
 	<script src="showbib.js"></script>
+	<script src="bibtexParse.js"></script>
 	<script>
 		$(document).ready(function(){
-			showBib(function(e) { return !e.hasKeyword("000nonmcts") && !e.hasKeyword("hidefromweb") && !e.isPpt(); });
+			showBib(function(e) { return true; });
 		});
 	</script>
 </head>
@@ -29,7 +29,7 @@
 			<p align="center" class="menuitem"><a href="../project/index.html">Project</a></p>
 			<p align="center" class="menuitem"><a href="../bibliography/project.html">Publications</a></p>
 		</td>
-		<td valign="top" bordercolor="#FF6600" bgcolor="#FFF5D7"><p class="style7"> This bibliography contains all known publications related to MCTS (<span id="refcount">?</span> at last count). Additional  material such as  presentations, web pages, repositories and so on may be found in the <a href="../resources/index.html">Resources</a> page.</p>
+		<td valign="top" bordercolor="#FF6600" bgcolor="#FFF5D7"><p class="style7"> This bibliography contains all known publications related to MCTS (<span id="refcount">?</span> at last count).</p>
 			<p class="style7">Please submit new entries <a href="mailto:edward.powley@york.ac.uk">to us</a> with complete reference details and associated URL.</p>
 			<hr noshade="noshade" />
 			<ul class="links" id="toplinks">
@@ -38,7 +38,7 @@
 				<li><a onclick="sortByYear()">Sort by year</a></li>
 			</ul>
 			<div class="loading">Loading, please wait...</div>
-			<ol id="bib"></ol>
+			<ul id="bib"></ul>
 		</td>
 	</tr>
 </table>
