@@ -1,0 +1,3 @@
+[submodule "edpowley"]
+	path = edpowley
+	url = https://github.com/edpowley/academic-homepage.git
